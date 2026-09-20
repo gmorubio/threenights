@@ -64,18 +64,33 @@ approximate with a `~`.
 | --- | --- | --- |
 | `title` | Yes | Title of the part, as `{ "es": "...", "en": "..." }`. Both languages required. Keep it spoiler-free: it is always visible. |
 | `timestamp` | Yes | Where the part **ends**, as `"HH:MM:SS"`. The last episode uses the string `"END"`. |
-| `cue` | No | A sentence describing the last shot or line before the cut, as `{ "es": "...", "en": "..." }`. If present, both languages are required. |
+| `cue` | No | A spoiler-free sentence that pins down the moment of the cut, as `{ "es": "...", "en": "..." }`. If present, both languages are required. See [Writing cues](#writing-cues). |
 
 There is no start time. Every part starts exactly where the previous one ends,
 and the first one starts at `00:00:00`. This makes gaps and overlaps
 impossible.
 
-Cues are hidden in the app until the viewer asks for them, because they
-describe how the part ends. That means a cue can be as detailed as it needs to
-be. Cues matter most when copies differ: a logo at the start or a different
+The interface calls each part "Night N" in English and "Parte N" in Spanish.
+
+## Writing cues
+
+Cues matter most when copies differ: a logo at the start or a different
 edition shifts every timestamp, and the cue is what still pins the cut down.
 
-The interface calls each part "Night N" in English and "Parte N" in Spanish.
+A cue is written for someone who has not seen the movie. It describes what is
+**seen and heard** at the cut, never what happens or what it means. The viewer
+should recognise the moment when they reach it, and learn nothing from reading
+the cue beforehand.
+
+- Fine: the place, who is on screen, an object, a gesture, a fade or a change
+  of music. `"Ends right after the van scene."`
+- Not fine: revelations, deaths, twists, who wins or loses, emotions that give
+  away how the scene turns out, or lines of dialogue that carry plot.
+  `"Ends right after the victory over the Hydra."` tells you who wins.
+
+Cues stay hidden in the app until the viewer asks for them. Even a spoiler-free
+cue gives something away, if only that a certain place shows up around a
+certain minute.
 
 ## Validation rules
 
