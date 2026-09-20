@@ -1,0 +1,17 @@
+{
+  "tmdbId": 11970,
+  "episodes": [
+    {
+      "title": { "es": "De cero a héroe", "en": "Zero to Hero" },
+      "timestamp": "00:49:08",
+      "cue": {
+        "es": "Termina justo después de la victoria contra la Hidra.",
+        "en": "Ends right after the victory over the Hydra."
+      }
+    },
+    {
+      "title": { "es": "La fuerza del corazón", "en": "The Strength of His Heart" },
+      "timestamp": "END"
+    }
+  ]
+}

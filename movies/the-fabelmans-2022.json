@@ -1,0 +1,25 @@
+{
+  "tmdbId": 804095,
+  "episodes": [
+    {
+      "title": { "es": "Persistencia de la visión", "en": "Persistence of Vision" },
+      "timestamp": "01:00:55",
+      "cue": {
+        "es": "Corte justo tras el suspiro final de Sammy, cuando apaga el proyector.",
+        "en": "Cut right after Sammy's final sigh, when he turns off the projector."
+      }
+    },
+    {
+      "title": { "es": "Nuestro secreto", "en": "Our Secret" },
+      "timestamp": "01:35:05",
+      "cue": {
+        "es": "Termina en la cena de la pelea: sangre en la alfombra, gritos, y Mitzi soltando la bomba — \"I started therapy\" — silencio, portazo, y Burt solo suspirando en la mesa.",
+        "en": "Ends at the dinner fight: blood on the carpet, shouting, and Mitzi dropping the bomb — \"I started therapy\" — silence, a slammed door, and Burt alone sighing at the table."
+      }
+    },
+    {
+      "title": { "es": "El horizonte", "en": "The Horizon" },
+      "timestamp": "END"
+    }
+  ]
+}

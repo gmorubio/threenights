@@ -1,0 +1,26 @@
+{
+  "tmdbId": 2059,
+  "runtime": "02:01:40",
+  "episodes": [
+    {
+      "title": { "es": "La Charlotte", "en": "La Charlotte" },
+      "timestamp": "00:51:40",
+      "cue": {
+        "es": "Termina justo después de la escena de la furgoneta.",
+        "en": "Ends right after the van scene."
+      }
+    },
+    {
+      "title": { "es": "Pass and Stow", "en": "Pass and Stow" },
+      "timestamp": "01:26:00",
+      "cue": {
+        "es": "Termina cuando Abigail le pregunta a Riley \"Riley, do you know how to get in touch with Ian?\" y él responde \"Excuse me?\".",
+        "en": "Ends when Abigail asks Riley \"Riley, do you know how to get in touch with Ian?\" and he replies \"Excuse me?\"."
+      }
+    },
+    {
+      "title": { "es": "Heere at the Wall", "en": "Heere at the Wall" },
+      "timestamp": "END"
+    }
+  ]
+}
