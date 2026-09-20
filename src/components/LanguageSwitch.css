@@ -1,0 +1,29 @@
+.lang-switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.lang-option {
+  min-width: 44px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.lang-option:hover {
+  color: var(--text);
+}
+
+.lang-option[aria-pressed='true'] {
+  background: var(--accent);
+  color: #1a1305;
+}

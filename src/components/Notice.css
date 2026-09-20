@@ -1,0 +1,26 @@
+.notice {
+  display: grid;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 154, 133, 0.35);
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  overflow-wrap: anywhere;
+}
+
+.notice-title {
+  color: var(--danger);
+}
+
+.notice-body {
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.notice-body ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+  list-style: disc;
+}

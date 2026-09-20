@@ -1,0 +1,29 @@
+.catalogue {
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 32px var(--gutter) 72px;
+  display: grid;
+  gap: 28px;
+}
+
+.catalogue-tagline {
+  max-width: 34ch;
+  font-size: clamp(1.4rem, 3.4vw, 2rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 28px 20px;
+}
+
+@media (min-width: 720px) {
+  .catalogue-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 36px 28px;
+  }
+}
