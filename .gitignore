@@ -11,5 +11,6 @@ dist
 # TMDB data written by `npm run sync`
 src/data/
 
-# Local tooling
-.claude/
+# Local tooling. Only the skills in .claude/skills/ are shared.
+.claude/*
+!.claude/skills/
