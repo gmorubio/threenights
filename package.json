@@ -4,12 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/sync-tmdb.ts --soft",
     "dev": "vite",
+    "sync": "node scripts/sync-tmdb.ts",
     "validate": "node scripts/validate.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "prebuild": "npm run validate && npm run typecheck",
+    "prebuild": "npm run validate && npm run typecheck && npm run sync",
     "build": "vite build",
+    "postbuild": "npm run check-dist",
+    "check-dist": "node scripts/check-dist.ts",
     "preview": "vite preview"
   },
   "dependencies": {

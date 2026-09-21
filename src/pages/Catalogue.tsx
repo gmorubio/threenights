@@ -14,7 +14,7 @@ import './Catalogue.css';
 type DetailsBySlug = Record<string, Loadable<MovieDetails>>;
 
 /** Errors with one shared cause; shown once instead of on every card. */
-const GLOBAL_ERRORS = new Set(['missing-token', 'unauthorized', 'network']);
+const GLOBAL_ERRORS = new Set(['missing-data']);
 
 export function Catalogue() {
   const { lang, t } = useLanguage();

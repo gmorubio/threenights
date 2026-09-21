@@ -9,7 +9,7 @@ export type Loadable<T> =
   | { status: 'error'; error: TmdbError };
 
 export function toTmdbError(error: unknown): TmdbError {
-  return error instanceof TmdbError ? error : new TmdbError('http', String(error));
+  return error instanceof TmdbError ? error : new TmdbError('missing-data', String(error));
 }
 
 export function useMovieDetails(

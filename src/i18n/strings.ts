@@ -67,20 +67,13 @@ export const strings: Record<Lang, Strings> = {
     languageSwitch: 'Idioma',
     tmdbNotice: 'Este producto usa la API de TMDB, pero no está avalado ni certificado por TMDB.',
     errorTitle: {
-      'missing-token': 'Falta el token de TMDB',
-      unauthorized: 'TMDB ha rechazado el token',
+      'missing-data': 'Faltan los datos de TMDB',
       'not-found': 'TMDB no conoce esta película',
-      network: 'No se puede conectar con TMDB',
-      http: 'TMDB ha devuelto un error',
     },
     errorBody: {
-      'missing-token':
-        'Copia .env.example como .env, pega tu token de acceso de lectura en VITE_TMDB_READ_TOKEN y reinicia npm run dev.',
-      unauthorized:
-        'Revisa que VITE_TMDB_READ_TOKEN en .env contenga el token de acceso de lectura completo, no la API key corta, y reinicia npm run dev.',
-      'not-found': 'Comprueba el tmdbId del fichero JSON.',
-      network: 'Comprueba tu conexión a internet y recarga la página.',
-      http: 'Vuelve a intentarlo en unos minutos.',
+      'missing-data':
+        'Ejecuta npm run sync para descargarlos. Necesita tu token de acceso de lectura en TMDB_READ_TOKEN, dentro de .env.',
+      'not-found': 'Comprueba el tmdbId del fichero JSON y vuelve a ejecutar npm run sync.',
     },
   },
   en: {
@@ -114,20 +107,13 @@ export const strings: Record<Lang, Strings> = {
     languageSwitch: 'Language',
     tmdbNotice: 'This product uses the TMDB API but is not endorsed or certified by TMDB.',
     errorTitle: {
-      'missing-token': 'TMDB token missing',
-      unauthorized: 'TMDB rejected the token',
+      'missing-data': 'TMDB data missing',
       'not-found': 'TMDB does not know this movie',
-      network: 'Cannot reach TMDB',
-      http: 'TMDB returned an error',
     },
     errorBody: {
-      'missing-token':
-        'Copy .env.example to .env, paste your API Read Access Token into VITE_TMDB_READ_TOKEN and restart npm run dev.',
-      unauthorized:
-        'Check that VITE_TMDB_READ_TOKEN in .env holds the full API Read Access Token, not the short API key, then restart npm run dev.',
-      'not-found': 'Check the tmdbId in the JSON file.',
-      network: 'Check your internet connection and reload the page.',
-      http: 'Try again in a few minutes.',
+      'missing-data':
+        'Run npm run sync to download it. It needs your API Read Access Token in TMDB_READ_TOKEN, inside .env.',
+      'not-found': 'Check the tmdbId in the JSON file and run npm run sync again.',
     },
   },
 };
