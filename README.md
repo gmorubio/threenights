@@ -1,126 +1,141 @@
 # Three Nights
 
 A cut guide for watching movies as a miniseries. Each movie is split into a few
-"nights", with the exact timestamp where to stop and an optional cue describing
-the last shot before the cut. It usually takes about three nights per movie,
-hence the name.
+"nights", with the exact timestamp where to stop and an optional spoiler-free
+cue describing the last shot before the cut. It usually takes about three
+nights per movie, hence the name.
 
 Three Nights does not play video. You watch the movie wherever you have it and
 keep the guide open to know when to pause.
 
-- No backend. The cuts live in JSON files in [`movies/`](movies).
-- Posters, overviews and cast come from [TMDB](https://www.themoviedb.org/),
-  fetched when the site is built and never from the browser.
+- A static site with no backend. The cuts live in JSON files in
+  [`movies/`](movies), one per movie.
+- Posters, overviews and cast come from [TMDB](https://www.themoviedb.org/).
 - Spanish and English, with a switch in the top right corner.
 
-## Getting started
+This repository is my own catalogue. It is open so that you can copy it and
+build yours.
 
-You need Node 23.6 or newer (the scripts run TypeScript directly with Node).
+## Make your own copy
 
-```bash
-npm install
-```
+You need [Node](https://nodejs.org/) 23.6 or newer and a free TMDB account.
 
-Create your `.env` from the example:
+1. **Fork** this repository on GitHub, or clone it:
 
-```bash
-cp .env.example .env
-```
+   ```bash
+   git clone https://github.com/gmorubio/threenights.git
+   ```
 
-Open `.env` and paste your TMDB **API Read Access Token** as the value of
-`TMDB_READ_TOKEN`. You find it at themoviedb.org under Settings > API. Use the
-long read access token, not the short API key. The `.env` file is gitignored
-and must never be committed.
+2. Install the dependencies:
 
-Start the app:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+3. Get your TMDB token. On themoviedb.org go to Settings > API and copy the
+   **API Read Access Token**. It is the long one, not the short API key.
 
-Then open http://localhost:5173. Starting the app first downloads the TMDB data
-for every movie into `src/data/tmdb.json`, which is gitignored. Offline, it
-warns and carries on with the data from the last time.
+4. Create your `.env` and paste the token as the value of `TMDB_READ_TOKEN`:
 
-## Adding a movie
+   ```bash
+   cp .env.example .env
+   ```
+
+   The `.env` file is gitignored. Never commit it.
+
+5. Start the app and open http://localhost:5173:
+
+   ```bash
+   npm run dev
+   ```
+
+The movies you see are mine. Delete the files in `movies/` and add your own.
+
+## Add a movie
+
+### With Claude Code, from a subtitle file
+
+The repository includes a [Claude Code](https://claude.com/claude-code) skill,
+[`slice-movie`](.claude/skills/slice-movie/SKILL.md), that reads the subtitles
+of a movie and finds the best places to stop: always on a scene change,
+preferably on a cliffhanger, with nights of 30 to 60 minutes when the story
+allows it.
+
+1. Get the subtitles of your copy of the movie as a `.srt` or `.vtt` file.
+   They must match your copy, or every timestamp will be off.
+2. Open this folder in Claude Code. The skill is picked up on its own.
+3. Attach the file or give its path, and ask for the cuts:
+
+   ```
+   /slice-movie ~/Downloads/Heat.1995.1080p.BluRay.srt
+   ```
+
+4. Claude proposes the nights, with titles, timestamps, cues and how confident
+   it is in each cut. Ask for changes ("try 4 parts", "another title for
+   night 2") or answer **ok**.
+5. After your ok it writes `movies/<name>-<year>.json`, validates it, downloads
+   the TMDB data and commits that one file. It never pushes.
+
+It is built for movies you have not seen yet: everything it says is
+spoiler-free, and it explains a cut with plot only if you ask for it. The
+subtitle file is never copied into the repository. The skill is written in
+Spanish, but it answers in the language you use.
+
+### By hand
 
 1. Find the movie on themoviedb.org. The number in the URL is its ID:
    `themoviedb.org/movie/2059-national-treasure` has ID `2059`.
-2. Create `movies/<readable-name>-<year>.json`. The file name becomes the URL
-   of the movie page, so keep it lowercase with hyphens.
-3. Fill it in following [docs/JSON_FORMAT.md](docs/JSON_FORMAT.md).
-4. Check it:
+2. Create `movies/<readable-name>-<year>.json` following
+   [docs/JSON_FORMAT.md](docs/JSON_FORMAT.md). The file name becomes the URL of
+   the movie page.
+3. Check it and download its TMDB data:
 
    ```bash
    npm run validate
-   ```
-
-5. Download its TMDB data:
-
-   ```bash
    npm run sync
    ```
 
-The dev server picks both up on its own. A file with errors shows up in the
-catalogue flagged as invalid, and its page lists what is wrong.
-
-## Where the TMDB token goes
-
-Nowhere near the browser. A static site cannot keep a secret: anything the
-JavaScript can read, a visitor can read too. So the app never calls TMDB.
-`npm run sync` does, on the machine that builds the site, and writes the
-result to `src/data/tmdb.json`. The app only reads that file. Posters load
-straight from TMDB's image server, which needs no token.
-
-Three things keep it that way:
-
-- The variable is called `TMDB_READ_TOKEN`, without the `VITE_` prefix. Vite
-  can only put `VITE_` variables into the bundle.
-- No file in `src/` reads the token. Only the two scripts in `scripts/` do.
-- `npm run check-dist` runs after every build and before every deploy, and
-  fails if the token appears in any file of `dist/`.
-
-## Publishing on GitHub Pages
+## Publish your copy on GitHub Pages
 
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds and
-publishes the site on every push to `main`. To set it up on your repository:
+publishes the site on every push to `main`. It is free for public
+repositories. On your fork:
 
 1. Under Settings > Secrets and variables > Actions, create a repository
    secret called `TMDB_READ_TOKEN` with your token.
 2. Under Settings > Pages, set the source to **GitHub Actions**.
-3. Push to `main`, or run the workflow by hand from the Actions tab. A manual
-   run is also how you refresh ratings and overviews without a new commit.
+3. In the Actions tab, enable workflows. GitHub disables them on new forks.
+4. Push to `main`, or run the workflow by hand. A manual run also refreshes
+   ratings and overviews without a new commit.
 
-GitHub does not hand secrets to workflows triggered from forks, and masks them
-in the logs. The workflow sets the `/<repo-name>/` base path on its own and
-copies `index.html` to `404.html` so that reloading a movie page works.
+Your site will be at `https://<your-user>.github.io/<repo-name>/`.
 
-## Commands
+### Your token stays private
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Syncs the TMDB data and starts the app locally. |
-| `npm run sync` | Downloads the TMDB data of every movie in `movies/`. |
-| `npm run validate` | Checks every file in `movies/` against the format rules. |
-| `npm test` | Runs the unit tests for time maths, validation and sorting. |
-| `npm run build` | Validates, type-checks, syncs, builds the static site into `dist/` and checks it. |
-| `npm run check-dist` | Fails if the TMDB token appears anywhere in `dist/`. |
+A static site cannot keep a secret: anything its JavaScript can read, a visitor
+can read too. So the site never calls TMDB. `npm run sync` does, on the machine
+that builds it, and the site only reads the result. Posters load from TMDB's
+image server, which needs no token.
 
-## Project layout
+- The variable has no `VITE_` prefix, so Vite cannot put it into the bundle.
+- No file in `src/` reads the token. Only the scripts in `scripts/` do.
+- `npm run check-dist` runs after every build and before every deploy, and
+  fails if the token appears in any published file.
+- GitHub masks secrets in the logs and does not hand them to workflows
+  triggered from forks.
 
-```
-movies/            One JSON file per movie. This is the content.
-scripts/           Validator, TMDB sync and the check of the built site.
-src/lib/           Format types, time maths, validation, TMDB data access.
-src/data/          TMDB data written by `npm run sync`. Gitignored.
-src/i18n/          Interface strings and the language context.
-src/components/    Shared interface pieces.
-src/pages/         The two screens: catalogue and movie.
-docs/              Format reference and roadmap.
-```
+## More
 
-What is planned for later versions is in [docs/ROADMAP.md](docs/ROADMAP.md).
+- [docs/JSON_FORMAT.md](docs/JSON_FORMAT.md): the movie file format and the
+  rule for spoiler-free cues.
+- [docs/ROADMAP.md](docs/ROADMAP.md): ideas postponed to later versions.
+- `npm test` runs the unit tests. `npm run build` validates, type-checks,
+  syncs and builds the site into `dist/`.
 
-## Attribution
+## License and attribution
 
-This product uses the TMDB API but is not endorsed or certified by TMDB.
+The code is under the [MIT License](LICENSE).
+
+This product uses the TMDB API but is not endorsed or certified by TMDB. Movie
+data and images belong to TMDB and their owners. If you publish your own copy,
+keep the TMDB attribution in the footer.
