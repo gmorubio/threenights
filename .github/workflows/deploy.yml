@@ -1,0 +1,70 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Manual runs refresh the TMDB data without a new commit.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run typecheck
+      - run: npm test
+
+      # The token is only given to the two steps that need it. The bundler
+      # itself never sees it.
+      - name: Fetch TMDB data
+        run: npm run sync
+        env:
+          TMDB_READ_TOKEN: ${{ secrets.TMDB_READ_TOKEN }}
+
+      - name: Build
+        run: npx vite build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+
+      - name: Check the token is not in the site
+        run: npm run check-dist
+        env:
+          TMDB_READ_TOKEN: ${{ secrets.TMDB_READ_TOKEN }}
+
+      # GitHub Pages serves 404.html for paths it does not know, such as a
+      # reloaded movie page. Serving the app there lets the router take over.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
