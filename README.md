@@ -95,43 +95,6 @@ Spanish, but it answers in the language you use.
    npm run sync
    ```
 
-## Publish your copy on GitHub Pages
-
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds and
-publishes the site on every push to `main`. It is free for public
-repositories. On your fork:
-
-1. Under Settings > Secrets and variables > Actions, create a repository
-   secret called `TMDB_READ_TOKEN` with your token.
-2. Under Settings > Pages, set the source to **GitHub Actions**.
-3. In the Actions tab, enable workflows. GitHub disables them on new forks.
-4. Push to `main`, or run the workflow by hand. A manual run also refreshes
-   ratings and overviews without a new commit.
-
-Your site will be at `https://<your-user>.github.io/<repo-name>/`.
-
-### Your token stays private
-
-A static site cannot keep a secret: anything its JavaScript can read, a visitor
-can read too. So the site never calls TMDB. `npm run sync` does, on the machine
-that builds it, and the site only reads the result. Posters load from TMDB's
-image server, which needs no token.
-
-- The variable has no `VITE_` prefix, so Vite cannot put it into the bundle.
-- No file in `src/` reads the token. Only the scripts in `scripts/` do.
-- `npm run check-dist` runs after every build and before every deploy, and
-  fails if the token appears in any published file.
-- GitHub masks secrets in the logs and does not hand them to workflows
-  triggered from forks.
-
-## More
-
-- [docs/JSON_FORMAT.md](docs/JSON_FORMAT.md): the movie file format and the
-  rule for spoiler-free cues.
-- [docs/ROADMAP.md](docs/ROADMAP.md): ideas postponed to later versions.
-- `npm test` runs the unit tests. `npm run build` validates, type-checks,
-  syncs and builds the site into `dist/`.
-
 ## License and attribution
 
 The code is under the [MIT License](LICENSE).
