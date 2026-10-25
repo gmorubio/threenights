@@ -43,3 +43,18 @@ export function parseWatched(raw: string | null): WatchedState {
 export function serializeWatched(state: WatchedState): string {
   return JSON.stringify(state);
 }
+
+/**
+ * Returns a new state with `index` flipped for `slug`, keeping the invariant:
+ * ascending, no duplicates, never empty (an emptied slug is removed).
+ * Out-of-range indices are kept. The input state is never mutated.
+ */
+export function toggleWatched(state: WatchedState, slug: string, index: number): WatchedState {
+  const current = (Object.hasOwn(state, slug) ? state[slug] : undefined) ?? [];
+  const indices = current.includes(index)
+    ? current.filter((i) => i !== index)
+    : [...current, index].sort((a, b) => a - b);
+
+  const others = Object.entries(state).filter(([key]) => key !== slug);
+  return Object.fromEntries(indices.length > 0 ? [...others, [slug, indices]] : others);
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseWatched, serializeWatched, type WatchedState } from './watched.ts';
+import { parseWatched, serializeWatched, toggleWatched, type WatchedState } from './watched.ts';
 
 describe('parseWatched', () => {
   it('returns empty progress when nothing is stored', () => {
@@ -64,5 +64,45 @@ describe('serializeWatched', () => {
     };
 
     expect(parseWatched(serializeWatched(state))).toEqual(state);
+  });
+});
+
+describe('toggleWatched', () => {
+  it('marks an unmarked index in ascending order and leaves other indices and movies unchanged', () => {
+    const state: WatchedState = { a: [0, 3], b: [1] };
+    const snapshot = structuredClone(state);
+
+    const result = toggleWatched(state, 'a', 2);
+
+    expect(result).toEqual({ a: [0, 2, 3], b: [1] });
+    expect(state).toEqual(snapshot);
+  });
+
+  it('adds an entry for a movie that had no progress yet', () => {
+    const state: WatchedState = {};
+
+    const result = toggleWatched(state, 'a', 0);
+
+    expect(result).toEqual({ a: [0] });
+    expect(state).toEqual({});
+  });
+
+  it('unmarks a marked index and keeps the others, including out-of-range ones', () => {
+    const state: WatchedState = { a: [0, 2, 7] };
+
+    const result = toggleWatched(state, 'a', 2);
+
+    expect(result).toEqual({ a: [0, 7] });
+    expect(state).toEqual({ a: [0, 2, 7] });
+  });
+
+  it('removes the slug when its only marked index is unmarked', () => {
+    const state: WatchedState = { a: [1], b: [0] };
+
+    const result = toggleWatched(state, 'a', 1);
+
+    expect(result).toEqual({ b: [0] });
+    expect(Object.hasOwn(result, 'a')).toBe(false);
+    expect(state).toEqual({ a: [1], b: [0] });
   });
 });
