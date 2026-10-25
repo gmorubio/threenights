@@ -49,19 +49,33 @@ export function serializeWatched(state: WatchedState): string {
   return JSON.stringify(state);
 }
 
+/** Whether `index` is marked for `slug`, out-of-range indices included. */
+export function isWatched(state: WatchedState, slug: string, index: number): boolean {
+  return indicesFor(state, slug).includes(index);
+}
+
 /**
- * Returns a new state with `index` flipped for `slug`, keeping the invariant:
- * ascending, no duplicates, never empty (an emptied slug is removed).
- * Out-of-range indices are kept. The input state is never mutated.
+ * Returns a new state with `index` marked (`watched` true) or unmarked for
+ * `slug`, keeping the invariant: ascending, no duplicates, never empty (an
+ * emptied slug is removed). Setting a value that is already there changes
+ * nothing. Out-of-range indices are kept. The input state is never mutated.
  */
-export function toggleWatched(state: WatchedState, slug: string, index: number): WatchedState {
-  const current = indicesFor(state, slug);
-  const indices = current.includes(index)
-    ? current.filter((i) => i !== index)
-    : [...current, index].sort((a, b) => a - b);
+export function markWatched(
+  state: WatchedState,
+  slug: string,
+  index: number,
+  watched: boolean,
+): WatchedState {
+  const current = indicesFor(state, slug).filter((i) => i !== index);
+  const indices = watched ? [...current, index].sort((a, b) => a - b) : current;
 
   const others = Object.entries(state).filter(([key]) => key !== slug);
   return Object.fromEntries(indices.length > 0 ? [...others, [slug, indices]] : others);
+}
+
+/** Returns a new state with `index` flipped for `slug`; see markWatched. */
+export function toggleWatched(state: WatchedState, slug: string, index: number): WatchedState {
+  return markWatched(state, slug, index, !isWatched(state, slug, index));
 }
 
 /** Watched indices inside 0..partCount-1; ascending thanks to the WatchedState invariant. */

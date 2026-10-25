@@ -77,3 +77,35 @@ test.describe('watched progress written by another tab without an event reaching
     expect(stored?.[slug], 'stored progress keeps parts 1 and 2').toEqual([0, 1]);
   });
 });
+
+test.describe('a click does what the button shows, even when storage is ahead of this tab', () => {
+  test.skip(!movie, 'No valid movie with at least 2 parts');
+
+  test('marking a part that storage already holds keeps it marked', async ({ page }) => {
+    const { slug } = movie!;
+    await page.goto(moviePath(slug));
+    await expect(
+      page.locator('.watched-toggle[aria-pressed="true"]'),
+      'no part starts pressed',
+    ).toHaveCount(0);
+
+    // Another "tab" marks part 1; this tab gets no event and still shows it unpressed.
+    await page.evaluate(
+      ([key, value]) => window.localStorage.setItem(key!, value!),
+      [WATCHED_KEY, JSON.stringify({ [slug]: [0] })],
+    );
+    await expect(
+      page.getByRole('button', { name: 'Vista, Parte 1', exact: true, pressed: false }),
+      'part 1 still shows unpressed in this tab',
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Vista, Parte 1', exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: 'Vista, Parte 1', exact: true, pressed: true }),
+      'part 1 is pressed after clicking to mark it',
+    ).toBeVisible();
+
+    const stored = JSON.parse((await readWatched(page)) ?? 'null') as Record<string, unknown>;
+    expect(stored?.[slug], 'stored progress keeps part 1 marked').toEqual([0]);
+  });
+});

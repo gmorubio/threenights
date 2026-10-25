@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  isWatched,
+  markWatched,
   nextPart,
   parseWatched,
   serializeWatched,
@@ -111,6 +113,34 @@ describe('toggleWatched', () => {
     expect(result).toEqual({ b: [0] });
     expect(Object.hasOwn(result, 'a')).toBe(false);
     expect(state).toEqual({ a: [1], b: [0] });
+  });
+});
+
+describe('markWatched', () => {
+  it('marks an index that storage already holds as marked, without flipping it off', () => {
+    const state: WatchedState = { a: [0] };
+
+    expect(markWatched(state, 'a', 0, true)).toEqual({ a: [0] });
+    expect(state).toEqual({ a: [0] });
+  });
+
+  it('leaves an unmarked index unmarked when asked to unmark it', () => {
+    expect(markWatched({ b: [1] }, 'a', 0, false)).toEqual({ b: [1] });
+  });
+
+  it('marks in ascending order and unmarks, removing an emptied slug', () => {
+    expect(markWatched({ a: [0, 3] }, 'a', 2, true)).toEqual({ a: [0, 2, 3] });
+    const result = markWatched({ a: [1], b: [0] }, 'a', 1, false);
+    expect(result).toEqual({ b: [0] });
+    expect(Object.hasOwn(result, 'a')).toBe(false);
+  });
+});
+
+describe('isWatched', () => {
+  it('tells whether an index is marked, ignoring slugs inherited from Object.prototype', () => {
+    expect(isWatched({ a: [0, 7] }, 'a', 7)).toBe(true);
+    expect(isWatched({ a: [0] }, 'a', 1)).toBe(false);
+    expect(isWatched({}, 'toString', 0)).toBe(false);
   });
 });
 
