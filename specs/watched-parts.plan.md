@@ -1,6 +1,6 @@
 ---
 spec: specs/watched-parts.md
-status: in-progress         # proposed | approved | in-progress | done | blocked
+status: done         # proposed | approved | in-progress | done | blocked
 branch: feature/watched-parts
 baseRef: 09a7888d9582990385a564720546acbaa34f7390
 ---
@@ -14,8 +14,8 @@ baseRef: 09a7888d9582990385a564720546acbaa34f7390
 - [x] unit-suite
 - [x] ui-tests
 - [x] full-suite
-- [ ] review
-- [ ] preexisting-decision
+- [x] review
+- [x] preexisting-decision
 
 ## Tasks
 <!-- One task = one red/green/refactor cycle. Ordered so each task builds on the previous ones. -->
@@ -110,3 +110,5 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 review review round 1: 2 finding(s) addressed
 review review round 2: 2 finding(s) addressed
 review review round 3: 1 finding(s) addressed
+2026-10-25 review — converged in 3 rounds, 5 new findings fixed (1 medium, 4 low), 0 deferred — 2bfc011
+2026-10-25 preexisting-decision — nothing deferred — (this commit)
