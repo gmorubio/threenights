@@ -15,6 +15,11 @@ function normalizeIndices(value: unknown[]): number[] {
   return [...new Set(value.filter(isPartIndex))].sort((a, b) => a - b);
 }
 
+/** Own entry only, so slugs such as "toString" never reach Object.prototype. */
+function indicesFor(state: WatchedState, slug: string): readonly number[] {
+  return (Object.hasOwn(state, slug) ? state[slug] : undefined) ?? [];
+}
+
 /**
  * Reads the stored progress without ever throwing: anything that does not
  * match the expected shape is dropped. The result is built with
@@ -50,11 +55,30 @@ export function serializeWatched(state: WatchedState): string {
  * Out-of-range indices are kept. The input state is never mutated.
  */
 export function toggleWatched(state: WatchedState, slug: string, index: number): WatchedState {
-  const current = (Object.hasOwn(state, slug) ? state[slug] : undefined) ?? [];
+  const current = indicesFor(state, slug);
   const indices = current.includes(index)
     ? current.filter((i) => i !== index)
     : [...current, index].sort((a, b) => a - b);
 
   const others = Object.entries(state).filter(([key]) => key !== slug);
   return Object.fromEntries(indices.length > 0 ? [...others, [slug, indices]] : others);
+}
+
+/** Watched indices inside 0..partCount-1; ascending thanks to the WatchedState invariant. */
+export function watchedParts(state: WatchedState, slug: string, partCount: number): readonly number[] {
+  return indicesFor(state, slug).filter((index) => index < partCount);
+}
+
+/**
+ * The first unwatched part, or null when nothing in range is watched yet
+ * or every part already is.
+ */
+export function nextPart(state: WatchedState, slug: string, partCount: number): number | null {
+  const watched = watchedParts(state, slug, partCount);
+  if (watched.length === 0 || watched.length === partCount) return null;
+  const seen = new Set(watched);
+  for (let index = 0; index < partCount; index++) {
+    if (!seen.has(index)) return index;
+  }
+  return null;
 }

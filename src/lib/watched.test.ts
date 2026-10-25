@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { parseWatched, serializeWatched, toggleWatched, type WatchedState } from './watched.ts';
+import {
+  nextPart,
+  parseWatched,
+  serializeWatched,
+  toggleWatched,
+  watchedParts,
+  type WatchedState,
+} from './watched.ts';
 
 describe('parseWatched', () => {
   it('returns empty progress when nothing is stored', () => {
@@ -104,5 +111,56 @@ describe('toggleWatched', () => {
     expect(result).toEqual({ b: [0] });
     expect(Object.hasOwn(result, 'a')).toBe(false);
     expect(state).toEqual({ a: [1], b: [0] });
+  });
+});
+
+describe('watchedParts', () => {
+  it('returns only the watched indices inside 0..N-1, in ascending order', () => {
+    const state: WatchedState = { a: [0, 2, 3, 9] };
+
+    expect(watchedParts(state, 'a', 3)).toEqual([0, 2]);
+  });
+
+  it('returns no parts for a movie without progress', () => {
+    expect(watchedParts({ b: [0] }, 'a', 3)).toEqual([]);
+  });
+
+  it('returns no parts for a slug inherited from Object.prototype', () => {
+    expect(watchedParts({}, 'toString', 3)).toEqual([]);
+  });
+});
+
+describe('nextPart', () => {
+  it('is the first unwatched part even when a later part is watched', () => {
+    expect(nextPart({ a: [1] }, 'a', 3)).toBe(0);
+  });
+
+  it('is the first gap between watched parts', () => {
+    expect(nextPart({ a: [0, 2] }, 'a', 3)).toBe(1);
+  });
+
+  it('is null for a movie without progress', () => {
+    expect(nextPart({}, 'a', 3)).toBeNull();
+  });
+
+  it('is null for a slug inherited from Object.prototype', () => {
+    expect(nextPart({}, 'toString', 3)).toBeNull();
+  });
+
+  it('is null when only out-of-range indices are watched', () => {
+    expect(nextPart({ a: [5, 8] }, 'a', 3)).toBeNull();
+  });
+
+  it('is null when every part of a multi-part movie is watched', () => {
+    expect(nextPart({ a: [0, 1, 2] }, 'a', 3)).toBeNull();
+    expect(nextPart({ a: [0, 1] }, 'a', 2)).toBeNull();
+  });
+
+  it('is null when every in-range part is watched, ignoring extra out-of-range indices', () => {
+    expect(nextPart({ a: [0, 1, 7] }, 'a', 2)).toBeNull();
+  });
+
+  it('is null for a single-part movie whose only part is watched', () => {
+    expect(nextPart({ a: [0] }, 'a', 1)).toBeNull();
   });
 });

@@ -36,7 +36,7 @@ Comandos: `npx vitest run src/lib/watched.test.ts` para T1-T3; `npx playwright t
   - Test: `src/lib/watched.test.ts` — (AC-10) `{ a: [0, 3], b: [1] }` alternando `('a', 2)` da `{ a: [0, 2, 3], b: [1] }` (índice insertado en orden) y el estado de entrada no cambia; (AC-11) `{ a: [0, 2, 7] }` alternando `('a', 2)` da `{ a: [0, 7] }`; (AC-12) `{ a: [1], b: [0] }` alternando `('a', 1)` da `{ b: [0] }` y `Object.hasOwn(result, 'a')` es `false`. Añadir el caso de un slug sin entrada (`{}` alternando `('a', 0)` da `{ a: [0] }`).
   - Notes: lecturas por slug con `Object.hasOwn`. Construir el nuevo estado sin mutar el anterior (por ejemplo `Object.fromEntries` sobre las entradas filtradas más la nueva). Mantener el invariante: ascendente, sin duplicados, nunca vacío (si queda vacío se borra la clave). Sin poda de índices fuera de rango.
 
-- [ ] **T3** — `watchedParts` y `nextPart` — ACs: AC-13, AC-14, AC-15, AC-16, AC-17
+- [x] **T3** — `watchedParts` y `nextPart` — ACs: AC-13, AC-14, AC-15, AC-16, AC-17
   - Level: unit
   - Files: `src/lib/watched.ts`, `src/lib/watched.test.ts`
   - Test: `src/lib/watched.test.ts` — (AC-13) con `{ a: [0, 2, 3, 9] }`, `watchedParts(state, 'a', 3)` es `[0, 2]`; con un slug sin entrada devuelve `[]`; con un slug heredado de `Object.prototype` (`'toString'`) devuelve `[]`. (AC-14) `nextPart`: vistas `{1}` de 3 → `0`; vistas `{0, 2}` de 3 → `1`; (AC-15) sin entrada → `null`, y solo `[5, 8]` con 3 partes → `null`; (AC-16) `[0, 1, 2]` de 3 → `null` (y `[0, 1]` de 2 → `null`); (AC-17) `[0]` de 1 → `null`.
