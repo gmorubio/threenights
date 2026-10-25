@@ -24,11 +24,33 @@
   min-width: 0;
 }
 
+.episode-next {
+  border-left: 3px solid var(--accent);
+}
+
+.episode-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
 .episode-label {
   color: var(--accent);
   font-size: 0.78rem;
   font-weight: 650;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.episode-next-label {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #1a1305;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -101,6 +123,13 @@
 .episode-cut-end {
   color: var(--muted);
   font-size: clamp(1.4rem, 4.5vw, 1.75rem);
+}
+
+/* Only the part's own texts fade; the toggle and secondary lines stay readable. */
+.episode-watched .episode-label,
+.episode-watched .episode-title,
+.episode-watched .episode-cut-time {
+  opacity: 0.6;
 }
 
 .episode-cue {

@@ -56,7 +56,7 @@ Comandos: `npx vitest run src/lib/watched.test.ts` para T1-T3; `npx playwright t
     - `EpisodeList.css`: `.watched-toggle` como pastilla con contorno (borde 1px `--line`, `border-radius: 999px`, `min-height: 44px`); `.watched-toggle[aria-pressed='true']` con fondo `--accent` y texto `#1a1305`. No poner `opacity` en ningún ancestro del botón.
     - `strings.ts`: `watchedLabel`, `watchedToggleName(n)`, `watchedCount(n)` en `Strings`, `es` y `en` (tabla del §4). `nextPart` y `watchedOf` se añaden en T5 y T7.
 
-- [ ] **T5** — Parte siguiente destacada y partes vistas atenuadas — ACs: AC-19, AC-20
+- [x] **T5** — Parte siguiente destacada y partes vistas atenuadas — ACs: AC-19, AC-20
   - Level: ui
   - Files: `src/pages/Movie.tsx`, `src/components/EpisodeList.tsx`, `src/components/EpisodeList.css`, `src/i18n/strings.ts`, `e2e/watched-next-part.spec.ts` (nuevo)
   - Test: `e2e/watched-next-part.spec.ts` — (AC-19) película de ≥2 partes: sin progreso, ningún `.episode-next-label`; marcar solo la última parte → la Parte 1 muestra «Siguiente» junto a «Parte 1» y ninguna otra lo muestra; la Parte 1 tiene `border-left-width` `3px` y `border-left-color` igual al color calculado de una sonda con `color: var(--accent)`, y el de las demás partes es distinto; marcar todas → ningún «Siguiente». (AC-20) sembrar la Parte 1 vista y la Parte 2 sin ver: opacidad efectiva (producto de `getComputedStyle(el).opacity` subiendo por los ancestros, calculado en `page.evaluate`) de `.episode-label`, `.episode-title` y `.episode-cut-time` < 1 en la Parte 1 y = 1 en la Parte 2; opacidad efectiva = 1 para `.watched-toggle`, `.episode-meta` y `.episode-cut-label` de la Parte 1.

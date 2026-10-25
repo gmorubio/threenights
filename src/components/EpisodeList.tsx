@@ -12,6 +12,8 @@ interface EpisodeListProps {
   approximate: boolean;
   /** Part indices (0-based) marked as watched. */
   watched: ReadonlySet<number>;
+  /** First unwatched part (0-based), or null when there is none to highlight. */
+  nextIndex: number | null;
   onToggle: (index: number) => void;
 }
 
@@ -25,6 +27,7 @@ export function EpisodeList({
   runtimeSeconds,
   approximate,
   watched,
+  nextIndex,
   onToggle,
 }: EpisodeListProps) {
   const spans = episodeSpans(episodes, runtimeSeconds);
@@ -39,6 +42,7 @@ export function EpisodeList({
           span={spans[index]!}
           approximate={approximate}
           isWatched={watched.has(index)}
+          isNext={index === nextIndex}
           onToggle={() => onToggle(index)}
         />
       ))}
@@ -52,22 +56,37 @@ interface EpisodeItemProps {
   span: EpisodeSpan;
   approximate: boolean;
   isWatched: boolean;
+  isNext: boolean;
   onToggle: () => void;
 }
 
-function EpisodeItem({ number, episode, span, approximate, isWatched, onToggle }: EpisodeItemProps) {
+function EpisodeItem({
+  number,
+  episode,
+  span,
+  approximate,
+  isWatched,
+  isNext,
+  onToggle,
+}: EpisodeItemProps) {
   const { lang, t } = useLanguage();
   // Cues describe how the part ends, so they start hidden. Nothing is stored:
   // a reload hides them again.
   const [cueOpen, setCueOpen] = useState(false);
   const cueId = useId();
   const approx = span.isLast && approximate;
+  const className = ['episode', isWatched && 'episode-watched', isNext && 'episode-next']
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <li className="episode">
+    <li className={className}>
       <div className="episode-head">
         <div className="episode-name">
-          <span className="episode-label">{t.partLabel(number)}</span>
+          <div className="episode-label-row">
+            <span className="episode-label">{t.partLabel(number)}</span>
+            {isNext && <span className="episode-next-label">{t.nextPart}</span>}
+          </div>
           <h3 className="episode-title">{episode.title[lang]}</h3>
           <p className="episode-meta">
             {span.duration !== null && (

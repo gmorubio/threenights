@@ -19,6 +19,8 @@ export interface Strings {
   watchedToggleName: (n: number) => string;
   /** Heading summary after the part count: "1 vista", "2 vistas". */
   watchedCount: (n: number) => string;
+  /** Tag next to the label of the first unwatched part. */
+  nextPart: string;
   approxNote: string;
   copyNote: (runtime: string) => string;
   edition: string;
@@ -56,6 +58,7 @@ export const strings: Record<Lang, Strings> = {
     watchedLabel: 'Vista',
     watchedToggleName: (n) => `Vista, Parte ${n}`,
     watchedCount: (n) => (n === 1 ? '1 vista' : `${n} vistas`),
+    nextPart: 'Siguiente',
     approxNote: 'Duración de la última parte aproximada, según TMDB.',
     copyNote: (runtime) =>
       `Cortes marcados sobre una copia de ${runtime}. Si la tuya dura otra cosa, guíate por las pistas.`,
@@ -99,6 +102,7 @@ export const strings: Record<Lang, Strings> = {
     watchedLabel: 'Watched',
     watchedToggleName: (n) => `Watched, Night ${n}`,
     watchedCount: (n) => `${n} watched`,
+    nextPart: 'Up next',
     approxNote: 'Length of the last night is approximate, based on TMDB.',
     copyNote: (runtime) =>
       `Cuts marked on a copy running ${runtime}. If yours differs, go by the cues.`,

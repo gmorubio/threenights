@@ -9,7 +9,7 @@ import { backdropUrl } from '../lib/tmdb.ts';
 import { useDocumentTitle } from '../lib/useDocumentTitle.ts';
 import { useMovieDetails } from '../lib/useMovieDetails.ts';
 import { useWatched } from '../lib/WatchedContext.tsx';
-import { watchedParts } from '../lib/watched.ts';
+import { nextPart, watchedParts } from '../lib/watched.ts';
 import { NotFound } from './NotFound.tsx';
 import './Movie.css';
 
@@ -56,6 +56,7 @@ export function Movie() {
   const approximate = fileRuntime === null && tmdbRuntime !== null;
   const loading = details.status === 'loading';
   const watchedIndices = new Set(watchedParts(watched, movie.slug, file.episodes.length));
+  const nextIndex = nextPart(watched, movie.slug, file.episodes.length);
 
   const runtimeLabel = (() => {
     if (runtimeSeconds === null) return null;
@@ -153,6 +154,7 @@ export function Movie() {
             runtimeSeconds={runtimeSeconds}
             approximate={approximate}
             watched={watchedIndices}
+            nextIndex={nextIndex}
             onToggle={(index) => toggle(movie.slug, index)}
           />
 

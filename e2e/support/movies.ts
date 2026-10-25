@@ -3,7 +3,7 @@
 // import src/lib/movies.ts or src/lib/tmdb.ts here: they use import.meta.glob.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { validateAll } from '../../src/lib/validate.ts';
 import type { MovieFile } from '../../src/lib/types.ts';
 
@@ -73,4 +73,36 @@ export async function seedWatched(page: Page, raw: string): Promise<void> {
 /** Raw stored progress, or null when nothing is stored. */
 export async function readWatched(page: Page): Promise<string | null> {
   return page.evaluate((key) => window.localStorage.getItem(key), WATCHED_KEY);
+}
+
+/**
+ * Effective opacity of the first element matching `selector` inside `scope`:
+ * the product of the computed opacity of the element and all its ancestors.
+ */
+export async function effectiveOpacity(
+  scope: Locator,
+  selector: string,
+): Promise<number> {
+  return scope.locator(selector).first().evaluate((element) => {
+    let opacity = 1;
+    for (let node: Element | null = element; node; node = node.parentElement) {
+      opacity *= Number.parseFloat(getComputedStyle(node).opacity);
+    }
+    return opacity;
+  });
+}
+
+/**
+ * Computed value of `--accent` as a colour, resolved through a probe element
+ * with `color: var(--accent)`, so it compares directly with computed colours.
+ */
+export async function accentColor(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const probe = document.createElement('span');
+    probe.style.color = 'var(--accent)';
+    document.body.appendChild(probe);
+    const color = getComputedStyle(probe).color;
+    probe.remove();
+    return color;
+  });
 }
