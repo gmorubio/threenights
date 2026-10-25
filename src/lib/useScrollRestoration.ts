@@ -121,14 +121,14 @@ export function useScrollRestoration(): void {
     let applied = 0;
     let appliedHeight = 0;
     applyTarget();
-    // Nothing above the top can move it: no need to watch the layout.
-    if (target === 0) return;
+    if (Math.abs(applied - target) < 1) return;
 
-    // The first render is not always the final layout (content still loading
-    // can make the page shorter, taller or reorder it, and scroll anchoring or
-    // clamping then moves the page): keep applying the offset on every layout
-    // change, even once reached, until the user scrolls or time runs out.
-    const observer = new ResizeObserver(applyTarget);
+    // The page is not tall enough yet (content still loading): keep applying
+    // the offset as it grows, until it fits, the user scrolls or time runs out.
+    const observer = new ResizeObserver(() => {
+      applyTarget();
+      if (Math.abs(applied - target) < 1) stop();
+    });
     const timer = window.setTimeout(stop, RESTORE_TIMEOUT_MS);
     // Dragging the scrollbar sends no pointer event to the page: a scroll away
     // from where we put it is the user's. If the page changed height meanwhile,
