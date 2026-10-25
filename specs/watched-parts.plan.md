@@ -107,3 +107,4 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 2026-10-25 unit-suite — passed — (this commit)
 2026-10-25 ui-tests — U1-U3 passed — (this commit)
 2026-10-25 full-suite — passed — (this commit)
+review review round 1: 2 finding(s) addressed

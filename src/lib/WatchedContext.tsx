@@ -3,12 +3,18 @@ import type { ReactNode } from 'react';
 import { WATCHED_KEY, parseWatched, serializeWatched, toggleWatched } from './watched.ts';
 import type { WatchedState } from './watched.ts';
 
-function readStored(): WatchedState {
+/** Stored progress, or null when storage cannot be read. */
+function tryReadStored(): WatchedState | null {
   try {
     return parseWatched(window.localStorage.getItem(WATCHED_KEY));
   } catch {
-    return {}; // Storage can be blocked; progress then lives in memory only.
+    return null;
   }
+}
+
+function readStored(): WatchedState {
+  // Storage can be blocked; progress then lives in memory only.
+  return tryReadStored() ?? {};
 }
 
 interface WatchedValue {
@@ -23,6 +29,8 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
   // Latest state, so toggle never computes inside a setState updater
   // (StrictMode calls updaters twice).
   const latest = useRef(watched);
+  // False once a write fails: storage then lags behind memory, so memory wins.
+  const persisted = useRef(true);
 
   const apply = useCallback((next: WatchedState) => {
     latest.current = next;
@@ -36,16 +44,25 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
       else if (event.key === null) apply({}); // storage.clear()
     };
     window.addEventListener('storage', onStorage);
+    // A write from another tab between the first read and this listener raised
+    // no event we could catch: read once more now that later writes will.
+    const stored = tryReadStored();
+    if (stored && serializeWatched(stored) !== serializeWatched(latest.current)) apply(stored);
     return () => window.removeEventListener('storage', onStorage);
   }, [apply]);
 
   const toggle = useCallback((slug: string, index: number) => {
-    const next = toggleWatched(latest.current, slug, index);
+    // Build on what is stored, not only on memory: another tab may have written
+    // something whose storage event has not reached this tab yet.
+    const stored = persisted.current ? tryReadStored() : null;
+    const next = toggleWatched(stored ?? latest.current, slug, index);
     apply(next);
     try {
       window.localStorage.setItem(WATCHED_KEY, serializeWatched(next));
+      persisted.current = true;
     } catch {
-      // Not remembered this time; nothing else to do.
+      // Not remembered this time; build on memory until a write succeeds.
+      persisted.current = false;
     }
   }, [apply]);
 
