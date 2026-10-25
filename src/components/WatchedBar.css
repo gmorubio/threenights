@@ -1,0 +1,20 @@
+.watched-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 2px;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.watched-segment {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.watched-segment[data-filled='true'] {
+  background: var(--accent);
+}

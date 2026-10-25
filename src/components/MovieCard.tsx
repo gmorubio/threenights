@@ -1,9 +1,12 @@
 import { Link } from 'react-router';
 import { Poster } from './Poster.tsx';
+import { WatchedBar } from './WatchedBar.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
 import type { Loadable } from '../lib/useMovieDetails.ts';
 import type { MovieDetails } from '../lib/tmdb.ts';
 import type { LoadedMovie } from '../lib/types.ts';
+import { useWatched } from '../lib/WatchedContext.tsx';
+import { watchedParts } from '../lib/watched.ts';
 import './MovieCard.css';
 
 interface MovieCardProps {
@@ -15,13 +18,22 @@ interface MovieCardProps {
 
 export function MovieCard({ movie, details, quietErrors }: MovieCardProps) {
   const { t } = useLanguage();
+  const { watched } = useWatched();
   const data = details?.status === 'ready' ? details.data : undefined;
   const loading = movie.data !== undefined && (details === undefined || details.status === 'loading');
   const title = data?.title || movie.slug;
+  const partTotal = movie.data?.episodes.length ?? 0;
+  const watchedIndices = watchedParts(watched, movie.slug, partTotal);
+  const hasProgress = watchedIndices.length > 0;
 
   return (
     <Link to={`/movie/${movie.slug}`} className="card">
-      <Poster path={data?.posterPath} title={title} loading={loading} />
+      <Poster
+        path={data?.posterPath}
+        title={title}
+        loading={loading}
+        overlay={hasProgress && <WatchedBar total={partTotal} watched={watchedIndices} />}
+      />
 
       <div className="card-text">
         {loading ? (
@@ -36,6 +48,10 @@ export function MovieCard({ movie, details, quietErrors }: MovieCardProps) {
             <span>{t.partCount(movie.data.episodes.length)}</span>
             {movie.data.edition && <span className="card-edition">{movie.data.edition}</span>}
           </span>
+        )}
+
+        {hasProgress && (
+          <span className="visually-hidden">{t.watchedOf(watchedIndices.length, partTotal)}</span>
         )}
 
         {!movie.data && <span className="card-flag">{t.invalidFile}</span>}

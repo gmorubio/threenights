@@ -1,19 +1,26 @@
 .card {
+  position: relative;
   display: grid;
   gap: 12px;
   height: 100%;
   align-content: start;
 }
 
+.card .poster-frame {
+  transition: transform 0.2s ease;
+}
+
 .card .poster {
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover .poster-frame,
+.card:focus-visible .poster-frame {
+  transform: translateY(-4px);
 }
 
 .card:hover .poster,
 .card:focus-visible .poster {
-  transform: translateY(-4px);
   box-shadow:
     0 0 0 1px var(--accent),
     0 18px 40px rgba(0, 0, 0, 0.5);
