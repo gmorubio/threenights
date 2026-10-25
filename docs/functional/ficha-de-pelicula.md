@@ -32,12 +32,13 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 - Origen: documentación inicial (2026-10-25)
 
 ## Partes (noches)
-- Sección «Partes» con el número total («1 parte», «3 partes»).
+- Sección «Partes» con el número total («1 parte», «3 partes») y, si hay partes vistas, el resumen «· N vista(s)».
 - Cada parte aparece numerada («Parte 1», «Parte 2»…; «Night 1»… en inglés) con:
   - Su título en el idioma activo. El título siempre está visible.
   - Su duración, redondeada al minuto («1 h 5 min» o «48 min»).
   - «Empieza en» con la hora de inicio.
   - «Corta en» con la hora de corte.
+  - El botón «Vista» para marcarla como vista. Las partes vistas se atenúan y la primera sin ver se destaca como «Siguiente» (ver [Partes vistas y progreso](partes-vistas.md)).
 - Las horas se muestran en formato H:MM:SS, como en un reproductor (por ejemplo «1:26:00»; las horas no llevan cero delante).
 - La primera parte empieza en 0:00:00 y cada parte empieza exactamente donde terminó la anterior.
 - La última parte muestra «Hasta el final» en lugar de «Corta en», con la hora final de la película debajo.
@@ -49,7 +50,7 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 - Caso límite: si la duración de TMDB no es posterior al último corte, la última parte muestra «Hasta el final» con «—», sin duración, y la nota de duración aproximada sigue apareciendo.
 - Los cortes intermedios desordenados o una duración del archivo anterior al último corte hacen que el fichero no sea válido (ver Archivo no válido).
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); partes vistas: specs/watched-parts.md
 
 ## Pista de corte
 - Solo las partes que tienen pista muestran este control.

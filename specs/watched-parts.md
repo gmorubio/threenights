@@ -1,7 +1,7 @@
 ---
 title: Marcar partes como vistas
 slug: watched-parts
-status: implementing
+status: done
 created: 2026-10-25
 updated: 2026-10-25
 branch: feature/watched-parts

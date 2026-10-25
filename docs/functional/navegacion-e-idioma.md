@@ -6,9 +6,11 @@ Marco común de todas las páginas: una cabecera para volver al inicio y elegir 
 - Todas las páginas comparten cabecera y pie.
 - Cabecera: la marca Three Nights (tres lunas y el nombre), que lleva al catálogo, y el selector de idioma. La cabecera queda fija arriba al desplazarse.
 - Pie: logotipo de TMDB, que abre la web de TMDB en otra pestaña, y el aviso «Este producto usa la API de TMDB, pero no está avalado ni certificado por TMDB» (en inglés si ese es el idioma activo).
-- Al cambiar de página la vista vuelve arriba del todo. Cambiar de idioma no mueve la posición.
+- Al ir a otra página con un enlace la vista vuelve arriba del todo. Cambiar de idioma no mueve la posición.
+- Con Atrás/Adelante del navegador o al recargar, la página conserva la posición de desplazamiento que tenía (por ejemplo, al volver de una ficha, el catálogo sigue a la altura de la tarjeta abierta).
+- Caso límite: el navegador aplica la posición guardada antes de que la página tenga su altura final (por ejemplo, con el catálogo aún cargando o, en algunos navegadores, mientras sigue montada la ficha de la que se vuelve). En ese caso la posición se recorta a la altura disponible y la vista puede quedar más arriba de donde estaba (problema conocido KI-001).
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); Atrás/Adelante y recarga: fix/catalogue-scroll-restore
 
 ## Selector de idioma
 - Dos opciones, ES y EN. La opción activa aparece resaltada.

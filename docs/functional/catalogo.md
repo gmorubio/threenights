@@ -16,9 +16,11 @@ Cada tarjeta enlaza a la ficha de su película y muestra:
 - **Título** en el idioma activo. Si no hay datos de TMDB, se muestra el nombre del fichero en tipografía monoespaciada.
 - **Datos secundarios**, separados por «·»: año (solo si se conoce), número de partes («1 parte» / «N partes»; en inglés «1 night» / «N nights») y la edición, resaltada, si el fichero la indica.
 
-Al pasar el ratón o enfocar la tarjeta con el teclado, el póster se eleva ligeramente.
+- **Progreso**, si hay al menos una parte vista: barra segmentada sobre el borde inferior del póster (ver [Partes vistas y progreso](partes-vistas.md#progreso-en-el-catálogo)).
 
-- Origen: documentación inicial (2026-10-25)
+Al pasar el ratón o enfocar la tarjeta con el teclado, el póster (con su barra de progreso, si la tiene) se eleva ligeramente.
+
+- Origen: documentación inicial (2026-10-25); progreso: specs/watched-parts.md
 
 ## Carga
 - Mientras se cargan los datos, cada película válida muestra un esqueleto animado en lugar del póster y del título; el número de partes y la edición ya son visibles.
