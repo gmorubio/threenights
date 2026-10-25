@@ -10,8 +10,8 @@ baseRef: 09a7888d9582990385a564720546acbaa34f7390
 ## Phases
 <!-- /implement ticks these as it goes; it resumes from the first unticked one. -->
 - [x] baseline
-- [ ] tdd
-- [ ] unit-suite
+- [x] tdd
+- [x] unit-suite
 - [ ] ui-tests
 - [ ] full-suite
 - [ ] review
@@ -103,3 +103,5 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 ## Log
 <!-- One line per checkpoint: date, phase, result, commit. -->
 2026-10-25 baseline — passed (unit, ui, typecheck) — 259b8ee
+2026-10-25 tdd — T1-T7 done (21 agents) — 87a06d1
+2026-10-25 unit-suite — passed — (this commit)
