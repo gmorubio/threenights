@@ -1,7 +1,7 @@
-import { useLayoutEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigationType } from 'react-router';
+import { Link, Outlet } from 'react-router';
 import { LanguageSwitch } from './LanguageSwitch.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
+import { useScrollRestoration } from '../lib/useScrollRestoration.ts';
 import './Layout.css';
 
 const TMDB_LOGO =
@@ -9,14 +9,9 @@ const TMDB_LOGO =
 
 export function Layout() {
   const { t } = useLanguage();
-  const { pathname } = useLocation();
-  const navType = useNavigationType();
-
-  // Forward navigations start at the top; Back/Forward and reload (POP) keep
-  // the position the browser restores.
-  useLayoutEffect(() => {
-    if (navType !== 'POP') window.scrollTo(0, 0);
-  }, [pathname, navType]);
+  // Forward navigations start at the top; Back/Forward and reload (POP) get
+  // back the position each history entry had.
+  useScrollRestoration();
 
   return (
     <div className="layout">
