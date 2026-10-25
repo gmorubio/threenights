@@ -13,7 +13,7 @@ baseRef: 09a7888d9582990385a564720546acbaa34f7390
 - [x] tdd
 - [x] unit-suite
 - [x] ui-tests
-- [ ] full-suite
+- [x] full-suite
 - [ ] review
 - [ ] preexisting-decision
 
@@ -106,3 +106,4 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 2026-10-25 tdd — T1-T7 done (21 agents) — 87a06d1
 2026-10-25 unit-suite — passed — (this commit)
 2026-10-25 ui-tests — U1-U3 passed — (this commit)
+2026-10-25 full-suite — passed — (this commit)
