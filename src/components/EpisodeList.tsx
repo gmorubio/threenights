@@ -10,6 +10,11 @@ interface EpisodeListProps {
   runtimeSeconds: number | null;
   /** True when the runtime comes from TMDB minutes rather than the file. */
   approximate: boolean;
+  /** Part indices (0-based) marked as watched. */
+  watched: ReadonlySet<number>;
+  /** First unwatched part (0-based), or null when there is none to highlight. */
+  nextIndex: number | null;
+  onToggle: (index: number) => void;
 }
 
 function formatDuration(seconds: number): string {
@@ -17,7 +22,14 @@ function formatDuration(seconds: number): string {
   return hours > 0 ? `${hours} h ${minutes} min` : `${minutes} min`;
 }
 
-export function EpisodeList({ episodes, runtimeSeconds, approximate }: EpisodeListProps) {
+export function EpisodeList({
+  episodes,
+  runtimeSeconds,
+  approximate,
+  watched,
+  nextIndex,
+  onToggle,
+}: EpisodeListProps) {
   const spans = episodeSpans(episodes, runtimeSeconds);
 
   return (
@@ -29,6 +41,9 @@ export function EpisodeList({ episodes, runtimeSeconds, approximate }: EpisodeLi
           episode={episode}
           span={spans[index]!}
           approximate={approximate}
+          isWatched={watched.has(index)}
+          isNext={index === nextIndex}
+          onToggle={() => onToggle(index)}
         />
       ))}
     </ol>
@@ -40,21 +55,38 @@ interface EpisodeItemProps {
   episode: Episode;
   span: EpisodeSpan;
   approximate: boolean;
+  isWatched: boolean;
+  isNext: boolean;
+  onToggle: () => void;
 }
 
-function EpisodeItem({ number, episode, span, approximate }: EpisodeItemProps) {
+function EpisodeItem({
+  number,
+  episode,
+  span,
+  approximate,
+  isWatched,
+  isNext,
+  onToggle,
+}: EpisodeItemProps) {
   const { lang, t } = useLanguage();
   // Cues describe how the part ends, so they start hidden. Nothing is stored:
   // a reload hides them again.
   const [cueOpen, setCueOpen] = useState(false);
   const cueId = useId();
   const approx = span.isLast && approximate;
+  const className = ['episode', isWatched && 'episode-watched', isNext && 'episode-next']
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <li className="episode">
+    <li className={className}>
       <div className="episode-head">
         <div className="episode-name">
-          <span className="episode-label">{t.partLabel(number)}</span>
+          <div className="episode-label-row">
+            <span className="episode-label">{t.partLabel(number)}</span>
+            {isNext && <span className="episode-next-label">{t.nextPart}</span>}
+          </div>
           <h3 className="episode-title">{episode.title[lang]}</h3>
           <p className="episode-meta">
             {span.duration !== null && (
@@ -67,6 +99,15 @@ function EpisodeItem({ number, episode, span, approximate }: EpisodeItemProps) {
               {t.startsAt} <time className="mono">{formatTimestamp(span.start)}</time>
             </span>
           </p>
+          <button
+            type="button"
+            className="watched-toggle"
+            aria-pressed={isWatched}
+            aria-label={t.watchedToggleName(number)}
+            onClick={onToggle}
+          >
+            <span aria-hidden="true">{isWatched ? '✓' : '○'}</span> {t.watchedLabel}
+          </button>
         </div>
 
         <div className="episode-cut">

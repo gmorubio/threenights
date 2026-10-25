@@ -20,12 +20,6 @@ ideas were considered and postponed. None of them is rejected.
 - **Sort by date added.** Needs a new `addedAt` field in the movie file,
   because file dates on disk are not reliable.
 
-## Watching
-
-- **Mark parts as watched.** Stored in the browser, with progress on each
-  poster and the next part highlighted. Limited to one browser per device
-  unless a backend appears.
-
 ## Movie file format
 
 - **Synopsis per part.** Extra writing and a spoiler risk.

@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router';
+import { useLayoutEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigationType } from 'react-router';
 import { LanguageSwitch } from './LanguageSwitch.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
 import './Layout.css';
@@ -10,10 +10,13 @@ const TMDB_LOGO =
 export function Layout() {
   const { t } = useLanguage();
   const { pathname } = useLocation();
+  const navType = useNavigationType();
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  // Forward navigations start at the top; Back/Forward and reload (POP) keep
+  // the position the browser restores.
+  useLayoutEffect(() => {
+    if (navType !== 'POP') window.scrollTo(0, 0);
+  }, [pathname, navType]);
 
   return (
     <div className="layout">

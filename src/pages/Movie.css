@@ -133,6 +133,11 @@
   gap: 12px;
 }
 
+.movie-section-head .parts-watched::before {
+  content: '·';
+  margin: 0 7px 0 -5px;
+}
+
 .movie-section-head h2 {
   font-size: 1.35rem;
   letter-spacing: -0.01em;

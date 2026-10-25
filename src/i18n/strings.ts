@@ -13,6 +13,16 @@ export interface Strings {
   showCue: string;
   hideCue: string;
   spoilerNote: string;
+  /** Visible text of the watched toggle. */
+  watchedLabel: string;
+  /** Fixed accessible name of the watched toggle: "Vista, Parte 2". */
+  watchedToggleName: (n: number) => string;
+  /** Heading summary after the part count: "1 vista", "2 vistas". */
+  watchedCount: (n: number) => string;
+  /** Tag next to the label of the first unwatched part. */
+  nextPart: string;
+  /** Hidden text of a catalogue card: "1 de 3 partes vistas". */
+  watchedOf: (watched: number, total: number) => string;
   approxNote: string;
   copyNote: (runtime: string) => string;
   edition: string;
@@ -47,6 +57,12 @@ export const strings: Record<Lang, Strings> = {
     showCue: 'Mostrar pista de corte',
     hideCue: 'Ocultar pista',
     spoilerNote: 'Describe el final de esta parte.',
+    watchedLabel: 'Vista',
+    watchedToggleName: (n) => `Vista, Parte ${n}`,
+    watchedCount: (n) => (n === 1 ? '1 vista' : `${n} vistas`),
+    nextPart: 'Siguiente',
+    watchedOf: (w, total) =>
+      total === 1 ? `${w} de 1 parte vista` : `${w} de ${total} partes vistas`,
     approxNote: 'Duración de la última parte aproximada, según TMDB.',
     copyNote: (runtime) =>
       `Cortes marcados sobre una copia de ${runtime}. Si la tuya dura otra cosa, guíate por las pistas.`,
@@ -87,6 +103,12 @@ export const strings: Record<Lang, Strings> = {
     showCue: 'Show cut cue',
     hideCue: 'Hide cue',
     spoilerNote: 'Describes how this night ends.',
+    watchedLabel: 'Watched',
+    watchedToggleName: (n) => `Watched, Night ${n}`,
+    watchedCount: (n) => `${n} watched`,
+    nextPart: 'Up next',
+    watchedOf: (w, total) =>
+      total === 1 ? `${w} of 1 night watched` : `${w} of ${total} nights watched`,
     approxNote: 'Length of the last night is approximate, based on TMDB.',
     copyNote: (runtime) =>
       `Cuts marked on a copy running ${runtime}. If yours differs, go by the cues.`,

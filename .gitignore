@@ -14,3 +14,7 @@ src/data/
 # Local tooling. Only the skills in .claude/skills/ are shared.
 .claude/*
 !.claude/skills/
+
+# Playwright output
+/test-results/
+/playwright-report/

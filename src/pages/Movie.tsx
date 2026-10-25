@@ -8,12 +8,15 @@ import { durationParts, formatTimestamp, parseTimestamp } from '../lib/time.ts';
 import { backdropUrl } from '../lib/tmdb.ts';
 import { useDocumentTitle } from '../lib/useDocumentTitle.ts';
 import { useMovieDetails } from '../lib/useMovieDetails.ts';
+import { useWatched } from '../lib/WatchedContext.tsx';
+import { nextPart, watchedParts } from '../lib/watched.ts';
 import { NotFound } from './NotFound.tsx';
 import './Movie.css';
 
 export function Movie() {
   const { slug = '' } = useParams();
   const { lang, t } = useLanguage();
+  const { watched, toggle } = useWatched();
   const movie = findMovie(slug);
   const details = useMovieDetails(movie?.data?.tmdbId, lang);
 
@@ -52,6 +55,8 @@ export function Movie() {
   const runtimeSeconds = fileRuntime ?? tmdbRuntime;
   const approximate = fileRuntime === null && tmdbRuntime !== null;
   const loading = details.status === 'loading';
+  const watchedIndices = new Set(watchedParts(watched, movie.slug, file.episodes.length));
+  const nextIndex = nextPart(watched, movie.slug, file.episodes.length);
 
   const runtimeLabel = (() => {
     if (runtimeSeconds === null) return null;
@@ -135,6 +140,9 @@ export function Movie() {
           <div className="movie-section-head">
             <h2 id="parts-heading">{t.partsHeading}</h2>
             <span className="muted">{t.partCount(file.episodes.length)}</span>
+            {watchedIndices.size > 0 && (
+              <span className="muted parts-watched">{t.watchedCount(watchedIndices.size)}</span>
+            )}
           </div>
 
           {fileRuntime !== null && (
@@ -145,6 +153,9 @@ export function Movie() {
             episodes={file.episodes}
             runtimeSeconds={runtimeSeconds}
             approximate={approximate}
+            watched={watchedIndices}
+            nextIndex={nextIndex}
+            onToggle={(index) => toggle(movie.slug, index)}
           />
 
           {approximate && <p className="movie-footnote">{t.approxNote}</p>}
