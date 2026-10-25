@@ -109,3 +109,4 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 2026-10-25 full-suite — passed — (this commit)
 review review round 1: 2 finding(s) addressed
 review review round 2: 2 finding(s) addressed
+review review round 3: 1 finding(s) addressed

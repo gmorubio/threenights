@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { moviePath, movieWithParts, readWatched } from './support/movies.ts';
+import { WATCHED_KEY, moviePath, movieWithParts, readWatched } from './support/movies.ts';
 
 test.use({ locale: 'es-ES' });
 
@@ -63,5 +63,50 @@ test.describe('watched progress synced across tabs', () => {
     expect(stored?.[slug], 'stored progress keeps indices 0 and 1 for the movie').toEqual(
       expect.arrayContaining([0, 1]),
     );
+  });
+});
+
+test.describe('a late storage event never replaces newer stored progress', () => {
+  test.skip(!movie, 'No valid movie with at least 2 parts');
+
+  test('an event carrying an older value leaves the tab matching what is stored', async ({
+    page,
+  }) => {
+    const { slug } = movie!;
+    await page.goto(moviePath(slug));
+    await page.getByRole('button', { name: 'Vista, Parte 1', exact: true }).click();
+    await expect(
+      page.getByRole('button', { name: 'Vista, Parte 1', exact: true, pressed: true }),
+      'part 1 is pressed after marking it',
+    ).toBeVisible();
+
+    // Another tab's earlier write (part 2 only) reaches this tab after its own
+    // write already landed in storage (part 1 only).
+    await page.evaluate(
+      ([key, value]) =>
+        window.dispatchEvent(
+          new StorageEvent('storage', {
+            key,
+            newValue: value,
+            storageArea: window.localStorage,
+          }),
+        ),
+      [WATCHED_KEY, JSON.stringify({ [slug]: [1] })],
+    );
+    // Let React render whatever the event changed before checking what shows.
+    await page.evaluate(
+      () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0))),
+    );
+
+    await expect(
+      page.getByRole('button', { name: 'Vista, Parte 1', exact: true, pressed: true }),
+      'part 1 from storage stays pressed',
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Vista, Parte 2', exact: true, pressed: false }),
+      'part 2 from the stale event does not show as pressed',
+    ).toBeVisible();
+    const stored = JSON.parse((await readWatched(page)) ?? 'null') as Record<string, unknown>;
+    expect(stored?.[slug], 'storage still holds part 1 only').toEqual([0]);
   });
 });

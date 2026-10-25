@@ -66,8 +66,10 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
   // Another tab wrote the progress: adopt it so the next toggle builds on it.
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
-      if (event.key === WATCHED_KEY) adopt(parseWatched(event.newValue));
-      else if (event.key === null) adopt({}); // storage.clear()
+      // Events can arrive after this tab's own later write, so event.newValue
+      // may be older than what is stored: adopt what storage holds now.
+      if (event.key === WATCHED_KEY) adopt(tryReadStored() ?? parseWatched(event.newValue));
+      else if (event.key === null) adopt(tryReadStored() ?? {}); // storage.clear()
     };
     // A page restored from the back/forward cache got no storage events.
     const onPageShow = (event: PageTransitionEvent) => {
