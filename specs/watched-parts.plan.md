@@ -12,7 +12,7 @@ baseRef: 09a7888d9582990385a564720546acbaa34f7390
 - [x] baseline
 - [x] tdd
 - [x] unit-suite
-- [ ] ui-tests
+- [x] ui-tests
 - [ ] full-suite
 - [ ] review
 - [ ] preexisting-decision
@@ -91,9 +91,9 @@ Comandos: `npx vitest run src/lib/watched.test.ts` para T1-T3; `npx playwright t
 <!-- [ui] ACs not already pinned by a Level: ui task. Written after the TDD phase. -->
 Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin cambios, lectura tolerante, `try/catch` del almacenamiento), así que no tendrían una prueba roja propia: se escriben después de la fase TDD como pruebas de regresión. Usan `e2e/support/movies.ts`, `test.use({ locale: 'es-ES' })`, se omiten con `test.skip` si ninguna película cumple la condición y cada resultado lleva su propio `expect` con nombre.
 
-- [ ] **U1** — ACs: AC-21, AC-22 — `e2e/watched-cues.spec.ts`. (AC-21) elegir una película de ≥2 partes con alguna parte k con `cue`; sembrar como vistas todas las partes salvo k (así k es la parte siguiente y hay al menos una vista); al abrir la ficha, `window.scrollY` es 0 y el botón «Mostrar pista de corte» de la parte k tiene `aria-expanded="false"`. (AC-22) sembrar vista una parte con `cue`; al pulsar su «Mostrar pista de corte», `aria-expanded="true"` y `.cue-text` visible.
-- [ ] **U2** — ACs: AC-28 — `e2e/watched-out-of-range.spec.ts`. Sembrar para una película de N partes solo índices fuera de rango (`[N, N + 5]`); en la ficha no hay botones `.watched-toggle` pulsados, ni `.episode-next-label`, ni `.parts-watched`; en el catálogo su tarjeta no tiene `.watched-bar`.
-- [ ] **U3** — ACs: AC-29 — `e2e/watched-blocked-storage.spec.ts`. Abrir la ficha de una película de ≥2 partes con almacenamiento normal y contar los `.notice`; después `page.addInitScript` que redefine el getter de `window.localStorage` para que lance, recargar, escuchar `pageerror`; marcar la Parte 1 → queda pulsada y la Parte 2 muestra «Siguiente»; ningún `pageerror`; no hay más `.notice` que en la cuenta inicial; tras recargar (el init script se repite), no hay partes pulsadas.
+- [x] **U1** — ACs: AC-21, AC-22 — `e2e/watched-cues.spec.ts`. (AC-21) elegir una película de ≥2 partes con alguna parte k con `cue`; sembrar como vistas todas las partes salvo k (así k es la parte siguiente y hay al menos una vista); al abrir la ficha, `window.scrollY` es 0 y el botón «Mostrar pista de corte» de la parte k tiene `aria-expanded="false"`. (AC-22) sembrar vista una parte con `cue`; al pulsar su «Mostrar pista de corte», `aria-expanded="true"` y `.cue-text` visible.
+- [x] **U2** — ACs: AC-28 — `e2e/watched-out-of-range.spec.ts`. Sembrar para una película de N partes solo índices fuera de rango (`[N, N + 5]`); en la ficha no hay botones `.watched-toggle` pulsados, ni `.episode-next-label`, ni `.parts-watched`; en el catálogo su tarjeta no tiene `.watched-bar`.
+- [x] **U3** — ACs: AC-29 — `e2e/watched-blocked-storage.spec.ts`. Abrir la ficha de una película de ≥2 partes con almacenamiento normal y contar los `.notice`; después `page.addInitScript` que redefine el getter de `window.localStorage` para que lance, recargar, escuchar `pageerror`; marcar la Parte 1 → queda pulsada y la Parte 2 muestra «Siguiente»; ningún `pageerror`; no hay más `.notice` que en la cuenta inicial; tras recargar (el init script se repite), no hay partes pulsadas.
 
 ## Deviations
 <!-- Filled when implementation finds the spec impossible, contradictory or incomplete. -->
@@ -105,3 +105,4 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 2026-10-25 baseline — passed (unit, ui, typecheck) — 259b8ee
 2026-10-25 tdd — T1-T7 done (21 agents) — 87a06d1
 2026-10-25 unit-suite — passed — (this commit)
+2026-10-25 ui-tests — U1-U3 passed — (this commit)
