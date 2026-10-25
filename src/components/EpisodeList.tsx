@@ -10,6 +10,9 @@ interface EpisodeListProps {
   runtimeSeconds: number | null;
   /** True when the runtime comes from TMDB minutes rather than the file. */
   approximate: boolean;
+  /** Part indices (0-based) marked as watched. */
+  watched: ReadonlySet<number>;
+  onToggle: (index: number) => void;
 }
 
 function formatDuration(seconds: number): string {
@@ -17,7 +20,13 @@ function formatDuration(seconds: number): string {
   return hours > 0 ? `${hours} h ${minutes} min` : `${minutes} min`;
 }
 
-export function EpisodeList({ episodes, runtimeSeconds, approximate }: EpisodeListProps) {
+export function EpisodeList({
+  episodes,
+  runtimeSeconds,
+  approximate,
+  watched,
+  onToggle,
+}: EpisodeListProps) {
   const spans = episodeSpans(episodes, runtimeSeconds);
 
   return (
@@ -29,6 +38,8 @@ export function EpisodeList({ episodes, runtimeSeconds, approximate }: EpisodeLi
           episode={episode}
           span={spans[index]!}
           approximate={approximate}
+          isWatched={watched.has(index)}
+          onToggle={() => onToggle(index)}
         />
       ))}
     </ol>
@@ -40,9 +51,11 @@ interface EpisodeItemProps {
   episode: Episode;
   span: EpisodeSpan;
   approximate: boolean;
+  isWatched: boolean;
+  onToggle: () => void;
 }
 
-function EpisodeItem({ number, episode, span, approximate }: EpisodeItemProps) {
+function EpisodeItem({ number, episode, span, approximate, isWatched, onToggle }: EpisodeItemProps) {
   const { lang, t } = useLanguage();
   // Cues describe how the part ends, so they start hidden. Nothing is stored:
   // a reload hides them again.
@@ -67,6 +80,15 @@ function EpisodeItem({ number, episode, span, approximate }: EpisodeItemProps) {
               {t.startsAt} <time className="mono">{formatTimestamp(span.start)}</time>
             </span>
           </p>
+          <button
+            type="button"
+            className="watched-toggle"
+            aria-pressed={isWatched}
+            aria-label={t.watchedToggleName(number)}
+            onClick={onToggle}
+          >
+            <span aria-hidden="true">{isWatched ? '✓' : '○'}</span> {t.watchedLabel}
+          </button>
         </div>
 
         <div className="episode-cut">

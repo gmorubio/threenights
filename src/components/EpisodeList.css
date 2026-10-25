@@ -51,6 +51,30 @@
   margin: 0 8px;
 }
 
+.watched-toggle {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 550;
+}
+
+.watched-toggle:hover {
+  border-color: var(--accent);
+}
+
+.watched-toggle[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #1a1305;
+}
+
 .episode-cut {
   display: grid;
   justify-items: end;
