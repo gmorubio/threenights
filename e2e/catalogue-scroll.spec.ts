@@ -119,6 +119,39 @@ test.describe('catalogue scroll position on reload and same-page links', () => {
       .toBeCloseTo(catalogueY, 0);
   });
 
+  test('reload keeps the offset when the catalogue changes layout after its first render', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const style = document.createElement('style');
+      // While titles load, the content above the grid is shorter (like the
+      // shorter skeleton titles) and the page is padded so the saved offset
+      // already fits on the first render. Style changes stay off the grid's
+      // ancestors so the browser's scroll anchoring stays active.
+      style.textContent = `
+        .catalogue-tagline { margin-bottom: 2000px; }
+        .catalogue:has(.card-title-skeleton) .catalogue-tagline { margin-bottom: 1800px; }
+        .layout:has(.card-title-skeleton) .site-footer { margin-top: 3000px; }
+      `;
+      const insert = () => document.documentElement.appendChild(style);
+      if (document.documentElement) insert();
+      else document.addEventListener('readystatechange', insert, { once: true });
+    });
+    const cards = await openCatalogue(page);
+    await cards.last().scrollIntoViewIfNeeded();
+    await expect.poll(() => scrollY(page), 'the catalogue is scrolled deep').toBeGreaterThan(1500);
+    const catalogueY = await scrollY(page);
+
+    await page.reload();
+    await expect(cards, 'the grid is shown again').toHaveCount(movieCount);
+    await expect(page.locator('.card-title-skeleton'), 'every title has loaded').toHaveCount(0);
+    await page.waitForTimeout(300);
+    expect(await scrollY(page), 'reload keeps the offset of the final layout').toBeCloseTo(
+      catalogueY,
+      0,
+    );
+  });
+
   test('the wordmark scrolls the catalogue to the top every time', async ({ page }) => {
     const cards = await openCatalogue(page);
     const wordmark = page.locator('a.wordmark');
