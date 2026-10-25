@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { WATCHED_KEY, parseWatched, serializeWatched, toggleWatched } from './watched.ts';
 import type { WatchedState } from './watched.ts';
@@ -24,16 +24,30 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
   // (StrictMode calls updaters twice).
   const latest = useRef(watched);
 
-  const toggle = useCallback((slug: string, index: number) => {
-    const next = toggleWatched(latest.current, slug, index);
+  const apply = useCallback((next: WatchedState) => {
     latest.current = next;
     setWatched(next);
+  }, []);
+
+  // Another tab wrote the progress: adopt it so the next toggle builds on it.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === WATCHED_KEY) apply(parseWatched(event.newValue));
+      else if (event.key === null) apply({}); // storage.clear()
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [apply]);
+
+  const toggle = useCallback((slug: string, index: number) => {
+    const next = toggleWatched(latest.current, slug, index);
+    apply(next);
     try {
       window.localStorage.setItem(WATCHED_KEY, serializeWatched(next));
     } catch {
       // Not remembered this time; nothing else to do.
     }
-  }, []);
+  }, [apply]);
 
   const value = useMemo(() => ({ watched, toggle }), [watched, toggle]);
 

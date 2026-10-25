@@ -67,7 +67,7 @@ Comandos: `npx vitest run src/lib/watched.test.ts` para T1-T3; `npx playwright t
     - `strings.ts`: `nextPart` («Siguiente» / «Up next»).
     - El helper de opacidad efectiva y la sonda de color pueden vivir en `e2e/support/movies.ts` si U1-U3 los reutilizan.
 
-- [ ] **T6** — Sincronización entre pestañas con el evento `storage` — ACs: AC-26
+- [x] **T6** — Sincronización entre pestañas con el evento `storage` — ACs: AC-26
   - Level: ui
   - Files: `src/lib/WatchedContext.tsx`, `e2e/watched-sync.spec.ts` (nuevo)
   - Test: `e2e/watched-sync.spec.ts` — dos páginas del mismo `context` (`context.newPage()`) con la ficha de la misma película de ≥2 partes; marcar Parte 1 en A → B muestra «Vista, Parte 1» pulsado sin recargar; marcar Parte 2 en B → A muestra «Vista, Parte 2» pulsado sin recargar; el valor de `threenights.watched` (leído con `page.evaluate`) contiene los índices 0 y 1 del slug.
