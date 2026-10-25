@@ -9,7 +9,7 @@ baseRef: 09a7888d9582990385a564720546acbaa34f7390
 
 ## Phases
 <!-- /implement ticks these as it goes; it resumes from the first unticked one. -->
-- [ ] baseline
+- [x] baseline
 - [ ] tdd
 - [ ] unit-suite
 - [ ] ui-tests
@@ -24,7 +24,7 @@ Orden: primero toda la lógica pura de `src/lib/watched.ts` (T1-T3, `Level: unit
 
 Comandos: `npx vitest run src/lib/watched.test.ts` para T1-T3; `npx playwright test e2e/<fichero>.spec.ts` para T4-T7.
 
-- [ ] **T1** — `parseWatched` tolerante y `serializeWatched` con ida y vuelta — ACs: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9
+- [x] **T1** — `parseWatched` tolerante y `serializeWatched` con ida y vuelta — ACs: AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9
   - Level: unit
   - Files: `src/lib/watched.ts` (nuevo), `src/lib/watched.test.ts` (nuevo)
   - Test: `src/lib/watched.test.ts` — (AC-1) `parseWatched(null)` devuelve `{}`; (AC-2) un texto no JSON (`'{nope'`) devuelve `{}` y `expect(() => …).not.toThrow()`; (AC-3) los JSON válidos que no son objeto (`'3'`, `'"x"'`, `'null'`, `'[0,1]'`) devuelven `{}`; (AC-4) `{"a":[0],"b":"x","c":{"0":1}}` → `{ a: [0] }`; (AC-5) `{"a":[1.5,"1",-1,9007199254740992,null,0,3]}` → `{ a: [0, 3] }`; (AC-6) `{"a":[2,0,2]}` → `{ a: [0, 2] }`; (AC-7) `{"a":[],"b":["x",-1],"c":[1]}` → `{ c: [1] }`; (AC-8) con `'{"__proto__":[0],"a":[1]}'`, `Object.getPrototypeOf(result)` es `Object.prototype` o `null`, y `Object.prototype` no gana propiedades (comparar `Object.getOwnPropertyNames(Object.prototype)` antes y después, y `({} as any)[0]` sigue `undefined`); (AC-9) `serializeWatched({ 'hercules-1997': [0, 2] })` es exactamente `'{"hercules-1997":[0,2]}'`, y `parseWatched(serializeWatched(state))` es `toEqual(state)` para un progreso con varias películas.
@@ -102,3 +102,4 @@ Estas AC describen comportamiento que ya queda implementado en T4-T7 (pista sin 
 
 ## Log
 <!-- One line per checkpoint: date, phase, result, commit. -->
+2026-10-25 baseline — passed (unit, ui, typecheck) — 259b8ee
