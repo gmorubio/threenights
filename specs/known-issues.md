@@ -4,7 +4,8 @@
 
 ## KI-001 — Al volver atrás, la posición del catálogo se recorta si la página aún no tiene su altura final
 - **Severity:** medium
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/components/Layout.tsx:15`
 - **Found:** 2026-10-25 by fix/catalogue-scroll-restore (review, hallazgo F-1)
 - **GitHub:** -
