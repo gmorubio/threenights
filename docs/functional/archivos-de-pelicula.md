@@ -3,18 +3,20 @@
 Cada película del catálogo es un archivo JSON en la carpeta de películas que solo guarda lo que TMDB no sabe: dónde están los cortes. Para añadir una película basta con dejar su archivo en la carpeta; no hay ningún índice que mantener. Las mismas reglas de formato se comprueban en la web, que marca los archivos no válidos sin dejar de funcionar, y desde la línea de comandos, que se ejecuta antes de cada build.
 
 ## Un archivo por película
-- Cada archivo `.json` de la carpeta de películas aparece en el catálogo; los archivos con otra extensión se ignoran.
+- Cada archivo `.json` de la carpeta de películas, salvo los ocultos, aparece en el catálogo; los archivos con otra extensión se ignoran.
+- **Archivos ocultos** (nombre que empieza por punto, como `.borrador.json`): la web no los muestra nunca, pero la línea de comandos sí los revisa y los rechaza por el formato del nombre, lo que detiene el build. La sincronización con TMDB también los lee y descarga los datos de su `tmdbId`.
 - El nombre del archivo sin la extensión es el identificador de la película y forma su dirección: `/movie/<nombre>`. Si la dirección no corresponde a ningún archivo, se muestra la página de no encontrado.
-- Convención de nombre: `<nombre-legible>-<año>.json`, en minúsculas y con guiones. Dos ediciones de la misma película son dos archivos distintos (por ejemplo, con el sufijo `-extended`).
+- **Formato del nombre (obligatorio)**: solo letras minúsculas sin acentos, dígitos y guiones, sin guiones al principio, al final ni dobles (`los-fabelman-2022` vale; `Los_Fabelman`, `-fabelman` o `fabelman--2022` no). Un archivo con otro nombre no es válido, con el error `File name must be lowercase letters, digits and hyphens.`, aunque su contenido sea correcto. Si además su JSON está mal escrito, solo se muestra `Invalid JSON: …`: el error de nombre únicamente aparece cuando el contenido se puede leer. Su tarjeta sigue enlazando a su ficha, que muestra ese error.
+- Convención recomendada (no se comprueba más allá del formato): `<nombre-legible>-<año>.json`. Dos ediciones de la misma película son dos archivos distintos (por ejemplo, con el sufijo `-extended`).
 - Título, póster, sinopsis y año no se escriben en el archivo: llegan de TMDB a través del `tmdbId`.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-002-004-validation
 
 ## Reglas del formato de un archivo
 Un archivo es válido solo si cumple todas estas reglas:
 
 - **Contenido**: un objeto JSON.
-- **`tmdbId`**: obligatorio. Vale cualquier valor salvo ausente, nulo o texto vacío; no se comprueba si es número o texto.
+- **`tmdbId`**: obligatorio. Vale cualquier valor salvo ausente, nulo o texto vacío o solo con espacios (estos dan el error `"tmdbId" is missing.`). No se comprueba si es número o texto: valores como `true` o `{}` pasan la validación, pero la película se queda sin datos de TMDB (problema conocido KI-012).
 - **`edition`** (edición): opcional. Si aparece, debe ser un texto no vacío (solo espacios cuenta como vacío). No se traduce.
 - **`runtime`** (duración total de la copia usada para marcar los cortes): opcional. Formato `HH:MM:SS` y debe ser posterior al último corte. Si solo hay una parte, basta con que sea mayor que `00:00:00`.
 - **`episodes`** (partes): lista con al menos una parte. No hay más límite: una película de una sola parte es válida.
@@ -26,19 +28,19 @@ Un archivo es válido solo si cumple todas estas reglas:
   - La última parte debe usar `END`, y solo ella puede usarlo.
 - No existe hora de inicio: cada parte empieza donde acaba la anterior y la primera empieza en `00:00:00`, así que no puede haber huecos ni solapes.
 
-Los errores se informan por archivo y, cuando procede, por parte (`Episode N`). Si `episodes` falta o está vacío, no se revisan las reglas de las partes ni la de que la duración sea posterior al último corte; el formato `HH:MM:SS` de `runtime` sí se sigue comprobando. Los mensajes de error están siempre en inglés, sea cual sea el idioma de la interfaz.
+Los errores se informan por archivo y, cuando procede, por parte (`Episode N`). El error de nombre de archivo, si lo hay, va el primero; si el JSON no se puede leer, en cambio, el único error que se muestra es `Invalid JSON: …`. Si `episodes` falta o está vacío, no se revisan las reglas de las partes ni la de que la duración sea posterior al último corte; el formato `HH:MM:SS` de `runtime` sí se sigue comprobando. Los mensajes de error están siempre en inglés, sea cual sea el idioma de la interfaz.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-002-004-validation
 
 ## Ediciones de una misma película
 - Dos archivos pueden compartir `tmdbId` solo si sus ediciones son distintas.
 - La comparación de ediciones no distingue mayúsculas y descarta los espacios al principio y al final (`"Extended"` y `" extended "` chocan; los espacios intermedios sí cuentan).
 - Un archivo sin edición cuenta como «sin edición»: solo uno de los archivos que comparten `tmdbId` puede omitirla.
-- El `tmdbId` se compara como texto, así que `2059` y `"2059"` se consideran el mismo.
+- El `tmdbId` se compara como texto y sin los espacios del principio y del final, así que `2059`, `"2059"` y `" 2059 "` se consideran el mismo.
 - Si dos archivos chocan, los dos pasan a ser no válidos y cada uno indica con qué otro archivo coincide.
-- Esta regla solo se aplica entre archivos que ya cumplen las reglas individuales.
+- Esta regla solo se aplica entre archivos que ya cumplen las reglas individuales (incluido el formato del nombre).
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-002-004-validation
 
 ## Archivos no válidos en la web
 Un archivo con JSON roto o que incumple alguna regla no rompe la web:
@@ -50,7 +52,7 @@ Un archivo con JSON roto o que incumple alguna regla no rompe la web:
 - Origen: documentación inicial (2026-10-25)
 
 ## Validación por línea de comandos
-- `npm run validate` revisa todos los archivos `.json` de la carpeta, en orden alfabético, con las mismas reglas que la web.
+- `npm run validate` revisa todos los archivos `.json` de la carpeta, en orden alfabético, con las mismas reglas que la web. A diferencia de la web, incluye los archivos ocultos (nombre que empieza por punto), que siempre fallan por el formato del nombre.
 - Por cada archivo muestra `ok` o `FAIL`; en los fallidos lista debajo cada error.
 - Al final resume `N movie file(s) valid.` o `X of N movie file(s) have errors.`.
 - Termina con fallo si algún archivo tiene problemas.

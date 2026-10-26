@@ -8,8 +8,9 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 - El título de la pestaña del navegador es «<título> · Three Nights». Mientras cargan los datos, si TMDB no los tiene o si el fichero no es válido, se usa el nombre del archivo en lugar del título. Si la dirección no corresponde a ninguna película, la pestaña muestra solo «Three Nights»; si después se cambia de idioma, pasa a «Aquí no hay nada · Three Nights» / «Nothing here · Three Nights».
 - Si la dirección no corresponde a ninguna película, aparece la página «Aquí no hay nada» («No existe ninguna película con esa dirección.») con un enlace al catálogo.
 - Al cambiar de idioma se actualizan en el momento los textos de la interfaz, los datos de TMDB y los títulos y pistas de las partes.
+- Al pasar de la ficha de una película a la de otra, la nueva empieza de cero: no muestra, ni por un instante, datos de la anterior.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-010-movie-remount
 
 ## Cabecera de la película
 - Imagen de fondo de la película detrás de la cabecera, si TMDB la tiene.
@@ -56,9 +57,9 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 - Solo las partes que tienen pista muestran este control.
 - La pista empieza oculta tras el botón «Mostrar pista de corte», acompañado del aviso de spoiler «Describe el final de esta parte.».
 - Al pulsarlo se muestra la pista, el botón pasa a «Ocultar pista» y el aviso de spoiler desaparece; vuelve a aparecer al ocultar la pista. Se puede mostrar y ocultar tantas veces como se quiera, de forma independiente en cada parte.
-- La decisión no se guarda: al recargar o volver a la ficha, todas las pistas vuelven a estar ocultas.
+- La decisión no se guarda: al recargar, al volver a la ficha o al pasar a la ficha de otra película, todas las pistas vuelven a estar ocultas.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-010-movie-remount
 
 ## Reparto
 - Sección «Reparto» con hasta 6 miembros, en el orden de importancia de TMDB.

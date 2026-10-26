@@ -33,11 +33,14 @@ El espectador puede marcar cada parte de una película como vista. La ficha aten
 - El progreso se recuerda en el navegador y sobrevive a recargas y a nuevas visitas. Es propio de cada navegador y dispositivo: no se comparte entre ellos.
 - **Varias pestañas.** Si la misma web está abierta en varias pestañas del mismo navegador, lo marcado en una aparece en las demás sin recargar, y las marcas hechas en distintas pestañas se suman sin pisarse. También se pone al día al volver a la web con Atrás/Adelante desde otro sitio.
 - **Almacenamiento bloqueado.** Si el navegador no permite guardar, marcar funciona igual durante la vida de la pestaña, sin avisos ni errores, pero al recargar se pierde todo.
-- **Fallo puntual al guardar.** Si una escritura falla (por ejemplo, almacenamiento lleno), la marca se mantiene en la pestaña y se guarda con la siguiente escritura que funcione. Caso límite: mientras tanto, esa marca se vuelve a imponer sobre lo que otras pestañas hayan cambiado después en la misma parte.
+- **Fallo puntual al guardar.** Si una escritura falla (por ejemplo, almacenamiento lleno), la marca se mantiene en la pestaña como pendiente y se guarda con la siguiente escritura que funcione: al marcar otra parte, o al recibir cambios de otra pestaña o volver a la web con Atrás/Adelante, momento en que se reintenta sola. Este último reintento solo ocurre si el navegador recupera la página de su caché; si la recarga, no hay reintento.
+  - La marca pendiente solo vive en la pestaña: si se recarga o se cierra antes de que alguna escritura funcione, se pierde.
+  - Si otra pestaña cambia después esa misma parte, gana la otra pestaña: la marca pendiente se descarta y no se vuelve a imponer.
+  - Caso límite: si la otra pestaña marca y desmarca esa parte (o al revés) antes de que esta se entere, la marca pendiente sobrevive y acaba pisando la última decisión de la otra pestaña (problema conocido KI-013).
 - **Datos guardados dañados.** Si lo guardado no se puede leer o tiene un formato inesperado, se ignora sin fallar (se descartan las entradas no válidas y se conservan las válidas) y la siguiente marca lo sobrescribe con un valor correcto.
 - **Fichero no válido.** Una película cuyo fichero no es válido no muestra botones, barra ni resumen, aunque tenga progreso guardado.
 
-- Origen: specs/watched-parts.md
+- Origen: specs/watched-parts.md; fix/ki-005-unsaved-marks
 
 ## Límites conocidos
 - El progreso se asocia a cada parte por su posición dentro de la película identificada por el nombre de su fichero, no por su tmdbId (varias ediciones de la misma película llevan progresos separados).
