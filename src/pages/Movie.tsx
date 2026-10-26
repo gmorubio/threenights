@@ -17,6 +17,11 @@ import './Movie.css';
 
 export function Movie() {
   const { slug = '' } = useParams();
+  // Keyed by slug so moving to another movie starts fresh: closed cues, no stale details.
+  return <MovieContent key={slug} slug={slug} />;
+}
+
+function MovieContent({ slug }: { slug: string }) {
   const { lang, t } = useLanguage();
   const { watched, toggle } = useWatched();
   const movie = findMovie(slug);
