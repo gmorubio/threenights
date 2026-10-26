@@ -107,6 +107,28 @@ describe('validateAll', () => {
     expect(results[0]?.data).toBeUndefined();
   });
 
+  const clashError = (rival: string) =>
+    `Same "tmdbId" and "edition" as "${rival}.json". Give each file a different "edition".`;
+
+  it('flags both files when their tmdbIds differ only by surrounding whitespace and neither has an edition', () => {
+    const { edition: _edition, ...noEdition } = valid();
+    const results = validateAll([
+      { slug: 'one', content: { ...noEdition, tmdbId: 2059 } },
+      { slug: 'two', content: { ...noEdition, tmdbId: ' 2059' } },
+    ]);
+    expect(results.find((r) => r.slug === 'one')?.errors).toEqual([clashError('two')]);
+    expect(results.find((r) => r.slug === 'two')?.errors).toEqual([clashError('one')]);
+  });
+
+  it('flags both files when their tmdbIds differ only by surrounding whitespace and the edition is the same', () => {
+    const results = validateAll([
+      { slug: 'one', content: { ...valid(), tmdbId: 2059 } },
+      { slug: 'two', content: { ...valid(), tmdbId: ' 2059 ' } },
+    ]);
+    expect(results.find((r) => r.slug === 'one')?.errors).toEqual([clashError('two')]);
+    expect(results.find((r) => r.slug === 'two')?.errors).toEqual([clashError('one')]);
+  });
+
   const slugError = 'File name must be lowercase letters, digits and hyphens.';
 
   it.each(['a?b', '50% off-2020', 'Amelie-2001', 'with space'])(

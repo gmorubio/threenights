@@ -110,7 +110,7 @@ export function findEditionClashes(
   const clashes = new Map<string, string[]>();
 
   for (const { slug, data } of movies) {
-    const key = `${String(data.tmdbId)}::${(data.edition ?? '').trim().toLowerCase()}`;
+    const key = `${String(data.tmdbId).trim()}::${(data.edition ?? '').trim().toLowerCase()}`;
     const other = seen.get(key);
     if (other === undefined) {
       seen.set(key, slug);
