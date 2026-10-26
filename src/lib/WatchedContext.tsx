@@ -28,6 +28,19 @@ interface UnsavedMark {
   slug: string;
   index: number;
   watched: boolean;
+  /** What storage held for this part when the mark was made. */
+  baseline: boolean;
+}
+
+/**
+ * Drops the marks storage no longer needs re-applied: those it already holds,
+ * and those whose part another tab changed since (the other tab wins).
+ */
+function prune(stored: WatchedState, unsaved: Map<string, UnsavedMark>): void {
+  for (const [key, mark] of unsaved) {
+    const now = isWatched(stored, mark.slug, mark.index);
+    if (now === mark.watched || now !== mark.baseline) unsaved.delete(key);
+  }
 }
 
 /** Re-applies this tab's marks that storage does not hold yet. */
@@ -45,8 +58,9 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
   // (StrictMode calls updaters twice).
   const latest = useRef(watched);
   // Marks set since the last successful write, keyed by slug and index. Storage
-  // lacks them, so they are re-applied on top of anything read from it; a
-  // successful write saves them all and empties this.
+  // lacks them, so they are re-applied on top of anything read from it until
+  // storage shows them saved or changed by another tab; a successful write
+  // saves them all and empties this.
   const unsaved = useRef(new Map<string, UnsavedMark>());
 
   const apply = useCallback((next: WatchedState) => {
@@ -54,13 +68,26 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
     setWatched(next);
   }, []);
 
-  // Adopts progress written elsewhere, keeping this tab's unsaved marks.
+  /** Writes the progress; on success every unsaved mark is saved. */
+  const save = useCallback((next: WatchedState) => {
+    try {
+      window.localStorage.setItem(WATCHED_KEY, serializeWatched(next));
+      unsaved.current.clear();
+    } catch {
+      // Not remembered this time: the marks stay unsaved until a write succeeds.
+    }
+  }, []);
+
+  // Adopts progress written elsewhere, keeping this tab's pending marks. When
+  // `stored` was really read from storage, pending marks are written once more.
   const adopt = useCallback(
-    (stored: WatchedState) => {
+    (stored: WatchedState, read: boolean) => {
+      prune(stored, unsaved.current);
       const next = withUnsaved(stored, unsaved.current);
       if (serializeWatched(next) !== serializeWatched(latest.current)) apply(next);
+      if (read && unsaved.current.size > 0) save(next);
     },
-    [apply],
+    [apply, save],
   );
 
   // Another tab wrote the progress: adopt it so the next toggle builds on it.
@@ -68,21 +95,24 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
     const onStorage = (event: StorageEvent) => {
       // Events can arrive after this tab's own later write, so event.newValue
       // may be older than what is stored: adopt what storage holds now.
-      if (event.key === WATCHED_KEY) adopt(tryReadStored() ?? parseWatched(event.newValue));
-      else if (event.key === null) adopt(tryReadStored() ?? {}); // storage.clear()
+      if (event.key !== WATCHED_KEY && event.key !== null) return;
+      const stored = tryReadStored();
+      if (stored) adopt(stored, true);
+      else if (event.key === WATCHED_KEY) adopt(parseWatched(event.newValue), false);
+      else adopt({}, false); // storage.clear()
     };
     // A page restored from the back/forward cache got no storage events.
     const onPageShow = (event: PageTransitionEvent) => {
       if (!event.persisted) return;
       const stored = tryReadStored();
-      if (stored) adopt(stored);
+      if (stored) adopt(stored, true);
     };
     window.addEventListener('storage', onStorage);
     window.addEventListener('pageshow', onPageShow);
     // A write from another tab between the first read and this listener raised
     // no event we could catch: read once more now that later writes will.
     const stored = tryReadStored();
-    if (stored) adopt(stored);
+    if (stored) adopt(stored, true);
     return () => {
       window.removeEventListener('storage', onStorage);
       window.removeEventListener('pageshow', onPageShow);
@@ -93,24 +123,20 @@ export function WatchedProvider({ children }: { children: ReactNode }) {
     // The click means what the button shows, so the wanted value comes from
     // the rendered state, never from flipping what storage holds.
     const want = !isWatched(latest.current, slug, index);
-    const mark = { slug, index, watched: want };
-    const key = `${index}:${slug}`;
-    unsaved.current.delete(key);
-    unsaved.current.set(key, mark);
     // Build on what is stored, not only on memory: another tab may have written
     // something whose storage event has not reached this tab yet.
     const stored = tryReadStored();
+    if (stored) prune(stored, unsaved.current);
+    const key = `${index}:${slug}`;
+    const baseline = stored ? isWatched(stored, slug, index) : !want;
+    unsaved.current.delete(key);
+    unsaved.current.set(key, { slug, index, watched: want, baseline });
     const next = stored
       ? withUnsaved(stored, unsaved.current)
       : markWatched(latest.current, slug, index, want);
     apply(next);
-    try {
-      window.localStorage.setItem(WATCHED_KEY, serializeWatched(next));
-      unsaved.current.clear();
-    } catch {
-      // Not remembered this time: the mark stays unsaved until a write succeeds.
-    }
-  }, [apply]);
+    save(next);
+  }, [apply, save]);
 
   const value = useMemo(() => ({ watched, toggle }), [watched, toggle]);
 
