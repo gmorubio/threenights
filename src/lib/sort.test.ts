@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { compareTitles, sortKey } from './sort.ts';
 
 describe('sortKey', () => {
@@ -23,5 +23,82 @@ describe('compareTitles', () => {
       compareTitles(a, b, 'en'),
     );
     expect(en).toEqual(['The Fabelmans', 'Hercules', 'National Treasure']);
+  });
+});
+
+describe('compareTitles collator reuse', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('builds at most one Intl.Collator per language when sorting many titles', async () => {
+    vi.resetModules();
+    const collatorSpy = vi.spyOn(Intl, 'Collator');
+    const { compareTitles: freshCompare } = await import('./sort.ts');
+
+    const es = [
+      'La búsqueda',
+      'Hércules',
+      'Los Fabelman',
+      'Zodiac',
+      'El padrino',
+      'Amélie',
+      'Una historia verdadera',
+      'Origen',
+      'Babe 2',
+      'Babe 10',
+    ];
+    const en = [
+      'National Treasure',
+      'Hercules',
+      'The Fabelmans',
+      'Zodiac',
+      'The Godfather',
+      'Amelie',
+      'A Straight Story',
+      'Inception',
+      'Babe 2',
+      'Babe 10',
+    ];
+
+    const sortedEs = [...es].sort((a, b) => freshCompare(a, b, 'es'));
+    const sortedEn = [...en].sort((a, b) => freshCompare(a, b, 'en'));
+
+    const constructionsFor = (lang: string) =>
+      collatorSpy.mock.calls.filter((args) => args[0] === lang).length;
+    expect(constructionsFor('es')).toBeLessThanOrEqual(1);
+    expect(constructionsFor('en')).toBeLessThanOrEqual(1);
+
+    // Sorting again reuses the cached collators.
+    [...es].sort((a, b) => freshCompare(a, b, 'es'));
+    [...en].sort((a, b) => freshCompare(a, b, 'en'));
+    expect(constructionsFor('es')).toBeLessThanOrEqual(1);
+    expect(constructionsFor('en')).toBeLessThanOrEqual(1);
+
+    // Ordering is unchanged: articles ignored, accents base-insensitive, numeric runs.
+    expect(sortedEs).toEqual([
+      'Amélie',
+      'Babe 2',
+      'Babe 10',
+      'La búsqueda',
+      'Los Fabelman',
+      'Hércules',
+      'Una historia verdadera',
+      'Origen',
+      'El padrino',
+      'Zodiac',
+    ]);
+    expect(sortedEn).toEqual([
+      'Amelie',
+      'Babe 2',
+      'Babe 10',
+      'The Fabelmans',
+      'The Godfather',
+      'Hercules',
+      'Inception',
+      'National Treasure',
+      'A Straight Story',
+      'Zodiac',
+    ]);
   });
 });
