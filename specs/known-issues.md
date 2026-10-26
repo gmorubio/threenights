@@ -52,7 +52,8 @@ Arreglo sugerido: normalizar la clave con `String(data.tmdbId).trim()`, idealmen
 
 ## KI-005 — Tras un fallo de escritura, las marcas sin guardar pisan cambios más nuevos de otras pestañas
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/lib/WatchedContext.tsx:57`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-5)
 - **GitHub:** -
