@@ -54,7 +54,7 @@ export function movieWithCue(minParts = 1): ValidMovie | undefined {
 }
 
 export function moviePath(slug: string): string {
-  return `/movie/${slug}`;
+  return `/movie/${encodeURIComponent(slug)}`;
 }
 
 /**

@@ -15,9 +15,18 @@ export function sortKey(title: string, lang: Lang): string {
   return trimmed;
 }
 
+const collators = new Map<Lang, Intl.Collator>();
+
+/** One collator per language: building one per comparison is expensive. */
+function collatorFor(lang: Lang): Intl.Collator {
+  let collator = collators.get(lang);
+  if (!collator) {
+    collator = new Intl.Collator(lang, { sensitivity: 'base', numeric: true });
+    collators.set(lang, collator);
+  }
+  return collator;
+}
+
 export function compareTitles(a: string, b: string, lang: Lang): number {
-  return new Intl.Collator(lang, { sensitivity: 'base', numeric: true }).compare(
-    sortKey(a, lang),
-    sortKey(b, lang),
-  );
+  return collatorFor(lang).compare(sortKey(a, lang), sortKey(b, lang));
 }

@@ -24,14 +24,17 @@ Por cada película se obtienen dos versiones, una en español (es-ES) y otra en 
 - Origen: documentación inicial (2026-10-25)
 
 ## Sincronización
-- Descarga los datos de cada identificador de TMDB distinto que aparezca en los ficheros de la carpeta movies. Se omiten los ficheros que no son JSON legible o que no tienen tmdbId (se informan en la validación) y también aquellos cuyo tmdbId no es número ni texto, o es texto en blanco. Estos últimos pasan la validación sin aviso y la web los muestra siempre con «Faltan los datos de TMDB», aunque se vuelva a sincronizar. Un fichero con otros errores de validación también se sincroniza, aunque la web lo muestre como «Fichero no válido». Las ediciones distintas de la misma película comparten los datos.
+- Descarga los datos de cada identificador de TMDB distinto que aparezca en los ficheros de la carpeta movies. Se omiten los ficheros que no son JSON legible o que no tienen tmdbId, o lo tienen en blanco (se informan en la validación), y también aquellos cuyo tmdbId no es número ni texto. Estos últimos pasan la validación sin aviso y la web los muestra siempre con «Faltan los datos de TMDB», aunque se vuelva a sincronizar (problema conocido KI-012). Un fichero con otros errores de validación también se sincroniza, aunque la web lo muestre como «Fichero no válido». Las ediciones distintas de la misma película comparten los datos.
+- Hace una petición por película e idioma, con un máximo de 6 en curso a la vez, para no superar el límite de conexiones de TMDB.
+- Cada petición espera como mucho 10 segundos. Si TMDB no responde a tiempo, la sincronización falla con «TMDB did not answer within 10 s.».
+- Si TMDB responde que hay demasiadas peticiones o con un error de servidor, la petición se reintenta hasta 3 veces, esperando lo que TMDB indique (como mucho 30 s) o, si no indica nada, 1, 2 y 4 segundos. Si sigue fallando, la sincronización se detiene con «TMDB answered with status N for movie ‹id›.».
 - Los datos quedan congelados hasta la siguiente sincronización: los cambios en TMDB no se ven en la web hasta volver a sincronizar y publicar.
 - Si TMDB no conoce una película en alguno de los dos idiomas, esa película queda marcada como «no encontrada».
-- Cualquier otro fallo detiene la sincronización entera, con un mensaje claro: falta el token, el token no es válido (se recuerda que hace falta el token de acceso de lectura completo, no la clave corta), no hay conexión con TMDB o TMDB responde con error. En ese caso no se sobrescriben los datos anteriores.
-- **Entorno de desarrollo**: al arrancarlo, la sincronización se ejecuta en modo suave. Si falla, solo muestra un aviso y la web arranca con los datos de la última sincronización (o sin datos, si nunca se sincronizó).
+- Cualquier otro fallo detiene la sincronización entera, con un mensaje claro: falta el token, el token no es válido (se recuerda que hace falta el token de acceso de lectura completo, no la clave corta), no hay conexión con TMDB, TMDB no responde a tiempo o TMDB responde con error. Tras el primer fallo no se lanzan más peticiones y no se sobrescriben los datos anteriores.
+- **Entorno de desarrollo**: al arrancarlo, la sincronización se ejecuta en modo suave. Si falla, solo muestra un aviso y la web arranca enseguida con los datos de la última sincronización (o sin datos, si nunca se sincronizó), sin esperar a las peticiones que aún estuvieran reintentándose.
 - **Build y publicación**: la sincronización es obligatoria. Si falla, el build se detiene.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-006-007-tmdb-sync; fix/known-issues-followups; fix/ki-002-004-validation
 
 ## Errores visibles en la web
 | Situación | Título del aviso | Qué indica |

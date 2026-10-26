@@ -7,7 +7,8 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isPresent(value: unknown): boolean {
-  return value !== undefined && value !== null && value !== '';
+  if (typeof value === 'string') return value.trim() !== '';
+  return value !== undefined && value !== null;
 }
 
 function checkLocalized(value: unknown, where: string, errors: string[]): void {
@@ -109,7 +110,7 @@ export function findEditionClashes(
   const clashes = new Map<string, string[]>();
 
   for (const { slug, data } of movies) {
-    const key = `${String(data.tmdbId)}::${(data.edition ?? '').trim().toLowerCase()}`;
+    const key = `${String(data.tmdbId).trim()}::${(data.edition ?? '').trim().toLowerCase()}`;
     const other = seen.get(key);
     if (other === undefined) {
       seen.set(key, slug);
@@ -123,12 +124,19 @@ export function findEditionClashes(
   return clashes;
 }
 
+/** File names (slugs): lowercase letters, digits and hyphens, as in docs/JSON_FORMAT.md. */
+const SLUG_FORMAT = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+function validateSlug(slug: string): string[] {
+  return SLUG_FORMAT.test(slug) ? [] : ['File name must be lowercase letters, digits and hyphens.'];
+}
+
 /** Validates a whole folder: per-file rules plus the cross-file rule. */
 export function validateAll(
   files: ReadonlyArray<{ slug: string; content: unknown }>,
 ): Array<{ slug: string; data?: MovieFile; errors: string[] }> {
   const results = files.map(({ slug, content }) => {
-    const errors = validateMovie(content);
+    const errors = [...validateSlug(slug), ...validateMovie(content)];
     return errors.length === 0
       ? { slug, data: content as MovieFile, errors }
       : { slug, errors };

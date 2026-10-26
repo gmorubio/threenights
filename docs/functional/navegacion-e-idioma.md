@@ -7,10 +7,14 @@ Marco común de todas las páginas: una cabecera para volver al inicio y elegir 
 - Cabecera: la marca Three Nights (tres lunas y el nombre), que lleva al catálogo, y el selector de idioma. La cabecera queda fija arriba al desplazarse.
 - Pie: logotipo de TMDB, que abre la web de TMDB en otra pestaña, y el aviso «Este producto usa la API de TMDB, pero no está avalado ni certificado por TMDB» (en inglés si ese es el idioma activo).
 - Al ir a otra página con un enlace la vista vuelve arriba del todo. Cambiar de idioma no mueve la posición.
-- Con Atrás/Adelante del navegador o al recargar, la página conserva la posición de desplazamiento que tenía (por ejemplo, al volver de una ficha, el catálogo sigue a la altura de la tarjeta abierta).
-- Caso límite: el navegador aplica la posición guardada antes de que la página tenga su altura final (por ejemplo, con el catálogo aún cargando o, en algunos navegadores, mientras sigue montada la ficha de la que se vuelve). En ese caso la posición se recorta a la altura disponible y la vista puede quedar más arriba de donde estaba (problema conocido KI-001).
+- Con Atrás/Adelante del navegador o al recargar, cada página vuelve exactamente a la posición de desplazamiento que tenía (por ejemplo, al volver de una ficha, el catálogo queda a la altura de la tarjeta abierta, aunque la ficha fuera más corta).
+  - En el catálogo y en la ficha, la posición se aplica cuando la página ya tiene su forma final: el catálogo, cuando ha cargado todos los títulos y se ha ordenado; la ficha, cuando han llegado (o han fallado) sus datos de TMDB. Mientras tanto la vista no salta.
+  - La página no encontrada (incluidas direcciones como `/movie/a/b`) aplica la posición al momento, sin esperar.
+  - Una página a la que se vuelve sin posición guardada se muestra desde arriba.
+- Las posiciones se recuerdan por pestaña mientras esta siga abierta, también tras recargar. Abrir la web de nuevo (escribiendo la dirección o desde un enlace externo) empieza arriba del todo. Si el navegador no deja guardarlas, Atrás/Adelante sigue funcionando dentro de la página, pero al recargar se pierden.
+- Caso límite: si en la misma pestaña se escribe a mano la dirección de la web después de haber navegado por ella, y luego se vuelve con Atrás a la visita anterior (cuando el navegador la recarga en vez de recuperarla de su caché), esa visita puede quedar en la posición de la nueva en lugar de la suya (problema conocido KI-011).
 
-- Origen: documentación inicial (2026-10-25); Atrás/Adelante y recarga: fix/catalogue-scroll-restore
+- Origen: documentación inicial (2026-10-25); Atrás/Adelante y recarga: fix/catalogue-scroll-restore; fix/ki-001-catalogue-scroll-offset; fix/known-issues-followups
 
 ## Selector de idioma
 - Dos opciones, ES y EN. La opción activa aparece resaltada.

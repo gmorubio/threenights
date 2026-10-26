@@ -27,7 +27,7 @@ export function MovieCard({ movie, details, quietErrors }: MovieCardProps) {
   const hasProgress = watchedIndices.length > 0;
 
   return (
-    <Link to={`/movie/${movie.slug}`} className="card">
+    <Link to={`/movie/${encodeURIComponent(movie.slug)}`} className="card">
       <Poster
         path={data?.posterPath}
         title={title}

@@ -1,22 +1,30 @@
-import { useLayoutEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigationType } from 'react-router';
+import { Link, Outlet, matchPath, useLocation } from 'react-router';
 import { LanguageSwitch } from './LanguageSwitch.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
+import { useScrollRestoration } from '../lib/useScrollRestoration.ts';
+import type { MarkPageReady } from '../lib/useScrollRestoration.ts';
 import './Layout.css';
 
 const TMDB_LOGO =
   'https://www.themoviedb.org/assets/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg';
 
+/** Shared with the routed pages through the Outlet context. */
+export interface LayoutContext {
+  /** The catalogue and the movie page call it once they have the final layout. */
+  markPageReady: MarkPageReady;
+}
+
 export function Layout() {
   const { t } = useLanguage();
   const { pathname } = useLocation();
-  const navType = useNavigationType();
 
-  // Forward navigations start at the top; Back/Forward and reload (POP) keep
-  // the position the browser restores.
-  useLayoutEffect(() => {
-    if (navType !== 'POP') window.scrollTo(0, 0);
-  }, [pathname, navType]);
+  // Forward navigations start at the top; Back/Forward and reload restore the
+  // saved offset once the catalogue or movie page has its final layout. Only
+  // those routes send the ready signal; NotFound (e.g. /movie/a/b) never does.
+  const markPageReady = useScrollRestoration(
+    pathname === '/' || matchPath('/movie/:slug', pathname) !== null,
+  );
+  const context: LayoutContext = { markPageReady };
 
   return (
     <div className="layout">
@@ -33,7 +41,7 @@ export function Layout() {
       </header>
 
       <main className="site-main">
-        <Outlet />
+        <Outlet context={context} />
       </main>
 
       <footer className="site-footer">

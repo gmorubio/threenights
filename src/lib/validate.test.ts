@@ -27,6 +27,19 @@ describe('validateMovie', () => {
     expect(validateMovie(movie)).toContain('"tmdbId" is missing.');
   });
 
+  it.each([
+    ['spaces', '   '],
+    ['a tab', '\t'],
+  ])('treats a tmdbId made only of %s as missing', (_label, tmdbId) => {
+    const movie = { ...valid(), tmdbId };
+    expect(validateMovie(movie)).toContain('"tmdbId" is missing.');
+  });
+
+  it.each([2059, '2059'])('keeps accepting the non-blank tmdbId %j', (tmdbId) => {
+    const movie = { ...valid(), tmdbId };
+    expect(validateMovie(movie)).toEqual([]);
+  });
+
   it('requires both languages in title, and in cue when present', () => {
     const movie = valid();
     movie.episodes[0]!.title = { es: 'Uno', en: ' ' };
@@ -92,5 +105,53 @@ describe('validateAll', () => {
     ]);
     expect(results.map((r) => r.errors.length)).toEqual([1, 1]);
     expect(results[0]?.data).toBeUndefined();
+  });
+
+  const clashError = (rival: string) =>
+    `Same "tmdbId" and "edition" as "${rival}.json". Give each file a different "edition".`;
+
+  it('flags both files when their tmdbIds differ only by surrounding whitespace and neither has an edition', () => {
+    const { edition: _edition, ...noEdition } = valid();
+    const results = validateAll([
+      { slug: 'one', content: { ...noEdition, tmdbId: 2059 } },
+      { slug: 'two', content: { ...noEdition, tmdbId: ' 2059' } },
+    ]);
+    expect(results.find((r) => r.slug === 'one')?.errors).toEqual([clashError('two')]);
+    expect(results.find((r) => r.slug === 'two')?.errors).toEqual([clashError('one')]);
+  });
+
+  it('flags both files when their tmdbIds differ only by surrounding whitespace and the edition is the same', () => {
+    const results = validateAll([
+      { slug: 'one', content: { ...valid(), tmdbId: 2059 } },
+      { slug: 'two', content: { ...valid(), tmdbId: ' 2059 ' } },
+    ]);
+    expect(results.find((r) => r.slug === 'one')?.errors).toEqual([clashError('two')]);
+    expect(results.find((r) => r.slug === 'two')?.errors).toEqual([clashError('one')]);
+  });
+
+  const slugError = 'File name must be lowercase letters, digits and hyphens.';
+
+  it.each(['a?b', '50% off-2020', 'Amelie-2001', 'with space'])(
+    'marks the file named "%s" as invalid with the slug error and no data',
+    (slug) => {
+      const results = validateAll([
+        { slug, content: valid() },
+        { slug: 'hercules-1997', content: { ...valid(), edition: 'Extended' } },
+      ]);
+      const bad = results.find((r) => r.slug === slug);
+      expect(bad?.errors).toContain(slugError);
+      expect(bad?.data).toBeUndefined();
+    },
+  );
+
+  it('keeps files with well-formed slugs valid', () => {
+    const results = validateAll([
+      { slug: 'hercules-1997', content: valid() },
+      { slug: 'a-theatrical', content: { ...valid(), edition: 'Other' } },
+    ]);
+    for (const result of results) {
+      expect(result.errors).toEqual([]);
+      expect(result.data).toBeDefined();
+    }
   });
 });

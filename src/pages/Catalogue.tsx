@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useOutletContext } from 'react-router';
 import { MovieCard } from '../components/MovieCard.tsx';
+import type { LayoutContext } from '../components/Layout.tsx';
 import { TmdbNotice } from '../components/Notice.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
 import { movies } from '../lib/movies.ts';
@@ -19,7 +21,12 @@ const GLOBAL_ERRORS = new Set(['missing-data']);
 export function Catalogue() {
   const { lang, t } = useLanguage();
   const [details, setDetails] = useState<DetailsBySlug | null>(null);
+  const { markPageReady } = useOutletContext<LayoutContext>();
+  const ready = details !== null;
   useDocumentTitle(null);
+
+  // The grid has its final height and order once every title has settled.
+  useLayoutEffect(() => (ready ? markPageReady() : undefined), [ready, markPageReady]);
 
   useEffect(() => {
     let cancelled = false;
