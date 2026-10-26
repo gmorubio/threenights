@@ -112,7 +112,8 @@ Arreglo sugerido: un collator cacheado por idioma a nivel de módulo y calcular 
 
 ## KI-010 — El estado de una película se arrastra si se reutiliza la ficha al cambiar de slug
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/pages/Movie.tsx:16`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-11)
 - **GitHub:** -
