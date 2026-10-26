@@ -6,9 +6,9 @@
 // `npm run dev` still starts offline with the data from the last sync.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { LANGS } from '../src/lib/types.ts';
-import type { TmdbSnapshot } from '../src/lib/tmdb.ts';
-import { fetchDetails } from '../src/lib/tmdbSync.ts';
+import { LANGS, type Lang } from '../src/lib/types.ts';
+import type { MovieDetails, TmdbSnapshot } from '../src/lib/tmdb.ts';
+import { fetchDetails, runPool } from '../src/lib/tmdbSync.ts';
 
 const root = join(import.meta.dirname, '..');
 const moviesFolder = join(root, 'movies');
@@ -47,13 +47,22 @@ async function sync(): Promise<void> {
     );
   }
 
-  const snapshot: TmdbSnapshot = {};
-  await Promise.all(
-    readTmdbIds().map(async (id) => {
-      const [es, en] = await Promise.all(LANGS.map((lang) => fetchDetails(id, lang, token)));
-      snapshot[id] = es && en ? { es, en } : null;
-    }),
+  // A pool keeps us well under TMDB's limit of about 20 connections per IP.
+  const ids = readTmdbIds();
+  const answers = await runPool(
+    ids.flatMap((id) =>
+      LANGS.map((lang) => async () => ({ id, lang, details: await fetchDetails(id, lang, token) })),
+    ),
   );
+
+  const byId = new Map<string, Partial<Record<Lang, MovieDetails | null>>>();
+  for (const { id, lang, details } of answers) {
+    byId.set(id, { ...byId.get(id), [lang]: details });
+  }
+  const snapshot: TmdbSnapshot = {};
+  for (const [id, { es, en }] of byId) {
+    snapshot[id] = es && en ? { es, en } : null;
+  }
 
   // Sorted keys keep the file stable between runs.
   const sorted = Object.fromEntries(Object.entries(snapshot).sort(([a], [b]) => a.localeCompare(b)));
