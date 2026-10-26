@@ -64,7 +64,8 @@ Arreglo sugerido: en `adopt`, descartar las marcas sin guardar que el almacenami
 
 ## KI-006 — El fetch a TMDB no tiene timeout
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `scripts/sync-tmdb.ts:108`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-6)
 - **GitHub:** -
@@ -75,7 +76,8 @@ Arreglo sugerido: `signal: AbortSignal.timeout(10_000)` y un mensaje de error pr
 
 ## KI-007 — Peticiones a TMDB en paralelo sin límite y sin reintento ante 429
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `scripts/sync-tmdb.ts:137`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-7)
 - **GitHub:** -
