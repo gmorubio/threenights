@@ -12,7 +12,7 @@ Página de inicio. Muestra el lema del producto y una cuadrícula con una tarjet
 
 ## Tarjeta de película
 Cada tarjeta enlaza a la ficha de su película y muestra:
-- **Póster.** Si la película no tiene póster, aparece un recuadro con el título escrito; si no hay datos de TMDB o el fichero no es válido, el recuadro muestra el nombre del fichero.
+- **Póster.** Si la película no tiene póster, o la imagen no llega a cargar, aparece un recuadro con el título escrito en lugar de un marco vacío; si no hay datos de TMDB o el fichero no es válido, el recuadro muestra el nombre del fichero.
 - **Título** en el idioma activo. Si no hay datos de TMDB, se muestra el nombre del fichero en tipografía monoespaciada.
 - **Datos secundarios**, separados por «·»: año (solo si se conoce), número de partes («1 parte» / «N partes»; en inglés «1 night» / «N nights») y la edición, resaltada, si el fichero la indica.
 
@@ -20,7 +20,7 @@ Cada tarjeta enlaza a la ficha de su película y muestra:
 
 Al pasar el ratón o enfocar la tarjeta con el teclado, el póster (con su barra de progreso, si la tiene) se eleva ligeramente.
 
-- Origen: documentación inicial (2026-10-25); progreso: specs/watched-parts.md
+- Origen: documentación inicial (2026-10-25); progreso: specs/watched-parts.md; fix/ki-008-poster-fallback
 
 ## Carga
 - Mientras se cargan los datos, cada película válida muestra un esqueleto animado en lugar del póster y del título; el número de partes y la edición ya son visibles.

@@ -23,11 +23,11 @@ El espectador puede marcar cada parte de una película como vista. La ficha aten
 ## Progreso en el catálogo
 - Si una película tiene al menos una parte vista, su tarjeta muestra una barra fina pegada al borde inferior del póster, con un segmento por parte: de color de acento si está vista y translúcido si no. Con todas vistas, la barra queda entera rellena, sin otra insignia.
 - Sin partes vistas no hay barra.
-- La barra aparece también sobre el hueco de carga y sobre el recuadro sin póster, y se eleva junto con el póster al pasar el ratón o enfocar la tarjeta. Solo informa: no tiene acción propia (al pulsarla se abre la ficha, como con el resto de la tarjeta) y los lectores de pantalla no la anuncian; el progreso se lee en el texto del enlace.
+- La barra aparece también sobre el hueco de carga y sobre el recuadro que sustituye al póster (sin póster o con la imagen sin cargar), y se eleva junto con el póster al pasar el ratón o enfocar la tarjeta. Solo informa: no tiene acción propia (al pulsarla se abre la ficha, como con el resto de la tarjeta) y los lectores de pantalla no la anuncian; el progreso se lee en el texto del enlace.
 - Para lectores de pantalla, el enlace de la tarjeta incluye el texto «1 de 3 partes vistas» («1 de 1 parte vista» si solo tiene una; en inglés «1 of 3 nights watched» / «1 of 1 night watched»).
 - El progreso no cambia el orden del catálogo, que sigue siendo alfabético.
 
-- Origen: specs/watched-parts.md
+- Origen: specs/watched-parts.md; fix/ki-008-poster-fallback
 
 ## Dónde se guarda y cuánto dura
 - El progreso se recuerda en el navegador y sobrevive a recargas y a nuevas visitas. Es propio de cada navegador y dispositivo: no se comparte entre ellos.
