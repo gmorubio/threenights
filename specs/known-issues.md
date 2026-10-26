@@ -16,7 +16,8 @@ Arreglo sugerido: guardar `window.scrollY` por `location.key` (sessionStorage, e
 
 ## KI-002 — El nombre de fichero (slug) no se valida y se usa sin codificar en la URL
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/lib/movies.ts:17`, `src/components/MovieCard.tsx:30`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-2, R-8)
 - **GitHub:** -
@@ -27,7 +28,8 @@ Arreglo sugerido: comprobar el slug en `validateAll` (`/^[a-z0-9]+(-[a-z0-9]+)*$
 
 ## KI-003 — Un `tmdbId` solo con espacios pasa la validación y luego se trata como ausente
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/lib/validate.ts:9`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-3)
 - **GitHub:** -
@@ -38,7 +40,8 @@ Arreglo sugerido: tratar también las cadenas en blanco como ausentes (`typeof v
 
 ## KI-004 — La detección de ediciones duplicadas no recorta el `tmdbId`
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/lib/validate.ts:112`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-4)
 - **GitHub:** -
