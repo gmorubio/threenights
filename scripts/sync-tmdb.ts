@@ -79,7 +79,8 @@ sync().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
   if (soft) {
     console.warn(`TMDB sync skipped: ${message}`);
-    return;
+    // Requests still retrying after the failure must not hold `npm run dev`.
+    process.exit(0);
   }
   console.error(`TMDB sync failed: ${message}`);
   process.exit(1);

@@ -163,3 +163,36 @@ test.describe('movie page scroll position on reload (KI-001)', () => {
     expect(await scrollY(page), 'reload keeps the movie page offset').toBeCloseTo(movieY, 0);
   });
 });
+
+test.describe('scroll position on a not-found movie URL (S-1)', () => {
+  test('Back to /movie/a/b after a reload restores its offset', async ({ page }) => {
+    await page.goto('/movie/a/b');
+    // The reload makes the app restore this entry; NotFound sends no ready signal.
+    await page.reload();
+    const backLink = page.locator('a.back-link');
+    await expect(backLink, 'the not-found page is shown').toBeVisible();
+
+    // Pads the page so it can scroll; the style survives same-document navigations.
+    await page.addStyleTag({ content: '.site-main { padding-bottom: 4000px; }' });
+    // Waits for the scroll event, which is when the app records the offset.
+    await page.evaluate(
+      () =>
+        new Promise((resolve) => {
+          window.addEventListener('scroll', resolve, { once: true });
+          window.scrollTo(0, 1500);
+        }),
+    );
+    expect(await scrollY(page), 'the not-found page is scrolled down').toBe(1500);
+
+    // A real click would first scroll the link into view and record that offset.
+    await backLink.dispatchEvent('click');
+    await expect(page.locator('a.card').first(), 'the catalogue is open').toBeVisible();
+
+    await page.goBack();
+    await expect(page, 'back on the not-found URL').toHaveURL(/\/movie\/a\/b$/);
+    await expect(backLink, 'the not-found page is shown again').toBeVisible();
+    await expect
+      .poll(() => scrollY(page), 'Back restores the not-found page offset')
+      .toBe(1500);
+  });
+});

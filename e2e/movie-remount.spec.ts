@@ -13,6 +13,12 @@ const withCueOnFirstPart = validMovies().filter(
 const movieA = withCueOnFirstPart[0];
 const movieB = withCueOnFirstPart[1];
 
+// 1x1 transparent PNG: every poster loads, so no late onError swap on A's page.
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64',
+);
+
 const tmdbFile = join(import.meta.dirname, '..', 'src', 'data', 'tmdb.json');
 const tmdb: Record<string, { es?: { title?: string } } | null> = existsSync(tmdbFile)
   ? (JSON.parse(readFileSync(tmdbFile, 'utf8')) as Record<string, { es?: { title?: string } } | null>)
@@ -25,6 +31,12 @@ function headerTitle(movie: ValidMovie): string {
 
 test.describe('movie page remounts when the slug changes (KI-010)', () => {
   test.skip(!movieA || !movieB, 'Needs two valid movies with a cue on part 1');
+
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://image.tmdb.org/t/p/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: PNG }),
+    );
+  });
 
   /** Opens movie A, opens its part 1 cue and installs an h1 recorder. */
   async function openAWithCue(page: Page): Promise<void> {
@@ -63,6 +75,8 @@ test.describe('movie page remounts when the slug changes (KI-010)', () => {
         const base = pathname.endsWith(fromPath!)
           ? pathname.slice(0, pathname.length - fromPath!.length)
           : '';
+        // Only what shows up from here on counts, not late changes on A's page.
+        (window as unknown as { __h1Seen: string[] }).__h1Seen.length = 0;
         history.pushState(null, '', `${base}${toPath}`);
         dispatchEvent(new PopStateEvent('popstate'));
       },

@@ -159,18 +159,18 @@ async function attempt(
   // A stalled connection would otherwise hold predev and CI for minutes.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
-  const failure = (): Error =>
+  const failure = (cause?: unknown): Error =>
     controller.signal.aborted
-      ? new Error(`TMDB did not answer within ${formatSeconds(timeoutMs)}.`)
-      : new Error('Could not reach TMDB. Check your internet connection.');
+      ? new Error(`TMDB did not answer within ${formatSeconds(timeoutMs)}.`, { cause })
+      : new Error('Could not reach TMDB. Check your internet connection.', { cause });
 
   try {
     // The token travels in a header, never in the URL.
     const response = await request(url, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       signal: controller.signal,
-    }).catch(() => {
-      throw failure();
+    }).catch((error: unknown) => {
+      throw failure(error);
     });
 
     if (response.status === 404) return { done: true, details: null };
@@ -185,7 +185,7 @@ async function attempt(
     if (!response.ok) throw statusError(response.status, id);
 
     const raw = (await response.json().catch((error: unknown) => {
-      throw controller.signal.aborted ? failure() : error;
+      throw controller.signal.aborted ? failure(error) : error;
     })) as RawMovie;
     return { done: true, details: toDetails(raw, lang) };
   } finally {

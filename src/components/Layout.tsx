@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation } from 'react-router';
+import { Link, Outlet, matchPath, useLocation } from 'react-router';
 import { LanguageSwitch } from './LanguageSwitch.tsx';
 import { useLanguage } from '../i18n/LanguageContext.tsx';
 import { useScrollRestoration } from '../lib/useScrollRestoration.ts';
@@ -19,8 +19,11 @@ export function Layout() {
   const { pathname } = useLocation();
 
   // Forward navigations start at the top; Back/Forward and reload restore the
-  // saved offset once the catalogue or movie page has its final layout.
-  const markPageReady = useScrollRestoration(pathname === '/' || pathname.startsWith('/movie/'));
+  // saved offset once the catalogue or movie page has its final layout. Only
+  // those routes send the ready signal; NotFound (e.g. /movie/a/b) never does.
+  const markPageReady = useScrollRestoration(
+    pathname === '/' || matchPath('/movie/:slug', pathname) !== null,
+  );
   const context: LayoutContext = { markPageReady };
 
   return (

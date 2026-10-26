@@ -116,6 +116,16 @@ describe('fetchDetails', () => {
     await expect(result).rejects.not.toThrow(TIMEOUT_MESSAGE);
   });
 
+  it('keeps the original fetch error as the cause of the no-connection error', async () => {
+    const original = new TypeError('fetch failed');
+    const fetch = vi.fn<FakeFetch>(async () => {
+      throw original;
+    });
+    const error = await fetchDetails('603', 'es', 'token', { fetch }).catch((e: unknown) => e);
+    expect((error as Error).message).toMatch(NO_CONNECTION_MESSAGE);
+    expect((error as Error).cause).toBe(original);
+  });
+
   it('resolves to null when TMDB answers 404', async () => {
     await expect(fetchDetails('999999', 'en', 'token', { fetch: answering(404) })).resolves.toBeNull();
   });
