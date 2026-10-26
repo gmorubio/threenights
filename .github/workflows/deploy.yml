@@ -1,23 +1,58 @@
-name: Deploy to GitHub Pages
+name: Test and deploy to GitHub Pages
 
 on:
   push:
+    branches: [main]
+  # Pull requests run the tests only; nothing is built or deployed.
+  pull_request:
     branches: [main]
   # Manual runs refresh the TMDB data without a new commit.
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
+# A newer push to the same pull request makes the older run pointless.
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run typecheck
+      - run: npm test
+
+      # The UI tests read the TMDB snapshot. Pull requests from forks get no
+      # secrets, so a failed sync only warns; tests that need the data skip.
+      - name: Fetch TMDB data
+        run: npm run sync -- --soft
+        env:
+          TMDB_READ_TOKEN: ${{ secrets.TMDB_READ_TOKEN }}
+
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+
+  build:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -30,9 +65,6 @@ jobs:
         uses: actions/configure-pages@v5
 
       - run: npm ci
-      - run: npm run validate
-      - run: npm run typecheck
-      - run: npm test
 
       # The token is only given to the two steps that need it. The bundler
       # itself never sees it.
@@ -62,6 +94,14 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    # Deployments never cancel each other.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
