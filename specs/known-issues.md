@@ -121,3 +121,47 @@ Arreglo sugerido: un collator cacheado por idioma a nivel de módulo y calcular 
 La ruta `movie/:slug` no tiene `key`, así que al pasar de una película a otra sin desmontar la ficha se conservan las pistas abiertas (por índice de parte, un spoiler no pedido) y, durante un render, los datos de TMDB de la anterior. Hoy es latente: ningún enlace va de una ficha a otra. Se vuelve alcanzable en cuanto exista navegación película a película.
 
 Arreglo sugerido: remontar por película (`<Movie key={slug} />` con un pequeño wrapper que lea `useParams`), o `key` por slug en `EpisodeList`.
+
+## KI-011 — La clave «default» del primer documento mezcla posiciones entre documentos de la misma pestaña
+- **Severity:** low
+- **Status:** open
+- **Location:** `src/lib/useScrollRestoration.ts:92`
+- **Found:** 2026-10-26 by fix/known-issues-2026-10-26 (review de KI-001)
+- **GitHub:** -
+
+Cada documento nuevo de la pestaña empieza con la clave de historial `default` del router. Si se escribe a mano la URL de la web después de haber navegado, la visita nueva sobrescribe la posición guardada del primer documento; al volver con Atrás a ese documento (sin caché atrás/adelante) se restaura la posición equivocada. Requiere navegar entre documentos completos, poco habitual en esta web.
+
+Arreglo sugerido: dar una clave única a la primera entrada al cargar (`history.replaceState({ ...history.state, key: crypto.randomUUID() }, '')` antes de que el router la lea) o indexar las posiciones por un id de documento guardado en `history.state`.
+
+## KI-012 — La validación no comprueba el tipo de `tmdbId`
+- **Severity:** low
+- **Status:** open
+- **Location:** `src/lib/validate.ts:9`
+- **Found:** 2026-10-26 by fix/known-issues-2026-10-26 (review de KI-002/003/004)
+- **GitHub:** -
+
+Un `tmdbId` que no es texto ni número (`true`, `{}`, `[]`) pasa `npm run validate`; la sincronización lo ignora y la ficha muestra «Faltan los datos de TMDB» en vez de un error de validación. Hoy es el comportamiento documentado («Its type is not checked» en `docs/JSON_FORMAT.md`), así que cambiarlo implica cambiar también esa documentación.
+
+Arreglo sugerido: aceptar solo texto no vacío o número finito, con un mensaje propio para el tipo incorrecto, y actualizar `docs/JSON_FORMAT.md`.
+
+## KI-013 — Una marca sin guardar sobrevive a un cambio de otra pestaña que vuelve al valor inicial
+- **Severity:** low
+- **Status:** open
+- **Location:** `src/lib/WatchedContext.tsx:39`
+- **Found:** 2026-10-26 by fix/known-issues-2026-10-26 (review de KI-005)
+- **GitHub:** -
+
+Tras un fallo de escritura, la marca pendiente se descarta si otra pestaña cambia esa parte, pero solo se compara el valor actual con el inicial. Si la otra pestaña marca y desmarca la misma parte antes de que esta pestaña procese los eventos (A→B→A), la marca sigue pendiente y se acaba escribiendo encima de la última decisión de la otra pestaña. Requiere un fallo de cuota en una pestaña y no en la otra, y dos cambios rápidos en la misma parte.
+
+Arreglo sugerido: comparar también contra `event.newValue` de cada evento `storage`, o descartar la marca en cuanto llegue cualquier evento que toque esa parte.
+
+## KI-014 — Con la lectura bloqueada, una marca pendiente se descarta según un `event.newValue` desfasado
+- **Severity:** low
+- **Status:** open
+- **Location:** `src/lib/WatchedContext.tsx:101`
+- **Found:** 2026-10-26 by fix/known-issues-2026-10-26 (review de KI-005)
+- **GitHub:** -
+
+Si la lectura del almacenamiento falla, el manejador del evento `storage` usa `event.newValue`, que puede ser anterior al valor guardado, y con él descarta para siempre marcas pendientes. Es latente: hoy el almacenamiento no falla de forma intermitente dentro de una misma página, y cuando está bloqueado otras pestañas tampoco pueden escribir.
+
+Arreglo sugerido: no descartar marcas cuando el estado no viene de una lectura real; en ese caso solo reaplicarlas para mostrarlas.
