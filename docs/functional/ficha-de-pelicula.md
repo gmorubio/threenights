@@ -5,7 +5,7 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 ## Acceso y navegación
 - Cada película tiene su propia dirección, basada en el nombre de su archivo.
 - Un enlace «Catálogo» arriba del todo lleva de vuelta al catálogo.
-- El título de la pestaña del navegador es «<título> · Three Nights». Mientras cargan los datos, si TMDB no los tiene o si el fichero no es válido, se usa el nombre del archivo en lugar del título. Si la dirección no corresponde a ninguna película, la pestaña muestra solo «Three Nights».
+- El título de la pestaña del navegador es «<título> · Three Nights». Mientras cargan los datos, si TMDB no los tiene o si el fichero no es válido, se usa el nombre del archivo en lugar del título. Si la dirección no corresponde a ninguna película, la pestaña muestra solo «Three Nights»; si después se cambia de idioma, pasa a «Aquí no hay nada · Three Nights» / «Nothing here · Three Nights».
 - Si la dirección no corresponde a ninguna película, aparece la página «Aquí no hay nada» («No existe ninguna película con esa dirección.») con un enlace al catálogo.
 - Al cambiar de idioma se actualizan en el momento los textos de la interfaz, los datos de TMDB y los títulos y pistas de las partes.
 
@@ -13,7 +13,7 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
 
 ## Cabecera de la película
 - Imagen de fondo de la película detrás de la cabecera, si TMDB la tiene.
-- Póster. Mientras cargan los datos se ve un hueco de carga; si no hay póster, se muestra un recuadro con el título.
+- Póster. Mientras cargan los datos se ve un hueco de carga; si no hay póster, o la imagen no llega a cargar, se muestra un recuadro con el título.
 - Título en el idioma activo. Si no se conoce (TMDB sin datos), se muestra el nombre del archivo en tipografía monoespaciada. Mientras carga, en su lugar aparece un hueco de carga.
 - Título original debajo, solo si es distinto del título.
 - Línea de datos, cada uno solo si se conoce:
@@ -29,7 +29,7 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
   - Si no existe en ninguno, aparece «TMDB no tiene sinopsis de esta película.».
 - En pantallas estrechas el póster y los datos se apilan en una sola columna.
 
-- Origen: documentación inicial (2026-10-25)
+- Origen: documentación inicial (2026-10-25); fix/ki-008-poster-fallback
 
 ## Partes (noches)
 - Sección «Partes» con el número total («1 parte», «3 partes») y, si hay partes vistas, el resumen «· N vista(s)».
@@ -48,7 +48,7 @@ Cada película del catálogo tiene su propia página. Ahí se ven sus datos (de 
   - Si no se conoce ninguna duración, la hora final aparece como «—» y la última parte no muestra duración.
 - Si el archivo indica la duración, sobre la lista aparece la nota «Cortes marcados sobre una copia de H:MM:SS. Si la tuya dura otra cosa, guíate por las pistas.».
 - Caso límite: si la duración de TMDB no es posterior al último corte, la última parte muestra «Hasta el final» con «—», sin duración, y la nota de duración aproximada sigue apareciendo.
-- Los cortes intermedios desordenados o una duración del archivo anterior al último corte hacen que el fichero no sea válido (ver Archivo no válido).
+- Cada corte tiene que ser estrictamente posterior al anterior (y el primero, posterior a 0:00:00), y la duración del archivo, si se indica, estrictamente posterior al último corte. Si no se cumple, el fichero no es válido (ver Archivo no válido); también cuando un corte coincide con el anterior o la duración coincide con el último corte.
 
 - Origen: documentación inicial (2026-10-25); partes vistas: specs/watched-parts.md
 
