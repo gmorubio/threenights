@@ -93,4 +93,30 @@ describe('validateAll', () => {
     expect(results.map((r) => r.errors.length)).toEqual([1, 1]);
     expect(results[0]?.data).toBeUndefined();
   });
+
+  const slugError = 'File name must be lowercase letters, digits and hyphens.';
+
+  it.each(['a?b', '50% off-2020', 'Amelie-2001', 'with space'])(
+    'marks the file named "%s" as invalid with the slug error and no data',
+    (slug) => {
+      const results = validateAll([
+        { slug, content: valid() },
+        { slug: 'hercules-1997', content: { ...valid(), edition: 'Extended' } },
+      ]);
+      const bad = results.find((r) => r.slug === slug);
+      expect(bad?.errors).toContain(slugError);
+      expect(bad?.data).toBeUndefined();
+    },
+  );
+
+  it('keeps files with well-formed slugs valid', () => {
+    const results = validateAll([
+      { slug: 'hercules-1997', content: valid() },
+      { slug: 'a-theatrical', content: { ...valid(), edition: 'Other' } },
+    ]);
+    for (const result of results) {
+      expect(result.errors).toEqual([]);
+      expect(result.data).toBeDefined();
+    }
+  });
 });

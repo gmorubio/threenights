@@ -123,12 +123,19 @@ export function findEditionClashes(
   return clashes;
 }
 
+/** File names (slugs): lowercase letters, digits and hyphens, as in docs/JSON_FORMAT.md. */
+const SLUG_FORMAT = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+function validateSlug(slug: string): string[] {
+  return SLUG_FORMAT.test(slug) ? [] : ['File name must be lowercase letters, digits and hyphens.'];
+}
+
 /** Validates a whole folder: per-file rules plus the cross-file rule. */
 export function validateAll(
   files: ReadonlyArray<{ slug: string; content: unknown }>,
 ): Array<{ slug: string; data?: MovieFile; errors: string[] }> {
   const results = files.map(({ slug, content }) => {
-    const errors = validateMovie(content);
+    const errors = [...validateSlug(slug), ...validateMovie(content)];
     return errors.length === 0
       ? { slug, data: content as MovieFile, errors }
       : { slug, errors };
