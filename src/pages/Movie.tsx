@@ -1,4 +1,6 @@
-import { Link, useParams } from 'react-router';
+import { useLayoutEffect } from 'react';
+import { Link, useOutletContext, useParams } from 'react-router';
+import type { LayoutContext } from '../components/Layout.tsx';
 import { EpisodeList } from '../components/EpisodeList.tsx';
 import { Notice, TmdbNotice } from '../components/Notice.tsx';
 import { Poster } from '../components/Poster.tsx';
@@ -19,6 +21,10 @@ export function Movie() {
   const { watched, toggle } = useWatched();
   const movie = findMovie(slug);
   const details = useMovieDetails(movie?.data?.tmdbId, lang);
+  const { markPageReady } = useOutletContext<LayoutContext>();
+  // The overview and cast appear once the details settle; without data the page is final.
+  const ready = !movie?.data || details.status !== 'loading';
+  useLayoutEffect(() => (ready ? markPageReady() : undefined), [ready, markPageReady]);
 
   const data = details.status === 'ready' ? details.data : undefined;
   const title = data?.title || slug;

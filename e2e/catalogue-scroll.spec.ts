@@ -140,3 +140,26 @@ test.describe('catalogue scroll position on same-page links and fresh visits (KI
     expect(await scrollY(page), 'a new visit starts at the top').toBe(0);
   });
 });
+
+test.describe('movie page scroll position on reload (KI-001)', () => {
+  test('reload keeps a movie page offset that is deeper than its loading layout', async ({
+    page,
+  }) => {
+    const cards = await openCatalogue(page);
+    await cards.first().click();
+    await expect(page, 'the movie page is open').toHaveURL(/\/movie\//);
+    const cast = page.locator('.cast');
+    await expect(cast, 'the cast list has loaded').toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await expect.poll(() => scrollY(page), 'the movie page is scrolled down').toBeGreaterThan(0);
+    const movieY = await scrollY(page);
+
+    await page.reload();
+    await expect(cast, 'the cast list is shown again').toBeVisible();
+    await page.evaluate(
+      () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+    );
+    expect(await scrollY(page), 'reload keeps the movie page offset').toBeCloseTo(movieY, 0);
+  });
+});

@@ -21,12 +21,12 @@ const GLOBAL_ERRORS = new Set(['missing-data']);
 export function Catalogue() {
   const { lang, t } = useLanguage();
   const [details, setDetails] = useState<DetailsBySlug | null>(null);
-  const { markCatalogueReady } = useOutletContext<LayoutContext>();
+  const { markPageReady } = useOutletContext<LayoutContext>();
   const ready = details !== null;
   useDocumentTitle(null);
 
   // The grid has its final height and order once every title has settled.
-  useLayoutEffect(() => (ready ? markCatalogueReady() : undefined), [ready, markCatalogueReady]);
+  useLayoutEffect(() => (ready ? markPageReady() : undefined), [ready, markPageReady]);
 
   useEffect(() => {
     let cancelled = false;

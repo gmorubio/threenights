@@ -10,8 +10,8 @@ const TMDB_LOGO =
 
 /** Shared with the routed pages through the Outlet context. */
 export interface LayoutContext {
-  /** The catalogue calls it once its grid has the final layout. */
-  markCatalogueReady: MarkPageReady;
+  /** The catalogue and the movie page call it once they have the final layout. */
+  markPageReady: MarkPageReady;
 }
 
 export function Layout() {
@@ -19,9 +19,9 @@ export function Layout() {
   const { pathname } = useLocation();
 
   // Forward navigations start at the top; Back/Forward and reload restore the
-  // saved offset, on the catalogue once its grid has the final layout.
-  const markCatalogueReady = useScrollRestoration(pathname === '/');
-  const context: LayoutContext = { markCatalogueReady };
+  // saved offset once the catalogue or movie page has its final layout.
+  const markPageReady = useScrollRestoration(pathname === '/' || pathname.startsWith('/movie/'));
+  const context: LayoutContext = { markPageReady };
 
   return (
     <div className="layout">
