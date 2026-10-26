@@ -27,6 +27,19 @@ describe('validateMovie', () => {
     expect(validateMovie(movie)).toContain('"tmdbId" is missing.');
   });
 
+  it.each([
+    ['spaces', '   '],
+    ['a tab', '\t'],
+  ])('treats a tmdbId made only of %s as missing', (_label, tmdbId) => {
+    const movie = { ...valid(), tmdbId };
+    expect(validateMovie(movie)).toContain('"tmdbId" is missing.');
+  });
+
+  it.each([2059, '2059'])('keeps accepting the non-blank tmdbId %j', (tmdbId) => {
+    const movie = { ...valid(), tmdbId };
+    expect(validateMovie(movie)).toEqual([]);
+  });
+
   it('requires both languages in title, and in cue when present', () => {
     const movie = valid();
     movie.episodes[0]!.title = { es: 'Uno', en: ' ' };

@@ -7,7 +7,8 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function isPresent(value: unknown): boolean {
-  return value !== undefined && value !== null && value !== '';
+  if (typeof value === 'string') return value.trim() !== '';
+  return value !== undefined && value !== null;
 }
 
 function checkLocalized(value: unknown, where: string, errors: string[]): void {
