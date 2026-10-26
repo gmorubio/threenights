@@ -100,7 +100,8 @@ Arreglo sugerido: estado `failed` (reiniciado al cambiar `path`), `onError={() =
 
 ## KI-009 — Se crea un `Intl.Collator` nuevo en cada comparación al ordenar
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/known-issues-2026-10-26
 - **Location:** `src/lib/sort.ts:18`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-10)
 - **GitHub:** -
