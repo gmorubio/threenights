@@ -81,7 +81,8 @@ Arreglo sugerido: limitar la concurrencia a 4–8 peticiones y reintentar 429 y 
 
 ## KI-008 — Un póster que falla al cargar deja el marco vacío
 - **Severity:** low
-- **Status:** open
+- **Status:** fixed
+- **Fixed in:** fix/ki-008-poster-fallback
 - **Location:** `src/components/Poster.tsx:34`
 - **Found:** 2026-10-25 by reviews/2026-10-25-app.md (R-9)
 - **GitHub:** -
